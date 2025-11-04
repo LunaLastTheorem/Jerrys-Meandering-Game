@@ -7,12 +7,13 @@ export class Grid extends Scene {
         super("Grid");
     }
 
-    preload() { }
+    preload() {
+        this.dist_val = 0
+    }
 
     create() {
         const red = 0xE9141D;
         const blue = 0x0015BC;
-
         const rows = myData.rows;
         const cols = myData.cols;
         const cellSize = 64;
@@ -29,10 +30,10 @@ export class Grid extends Scene {
                 const y = offsetY + row * cellSize + cellSize / 2;
 
                 const colors = [red, blue];
-                const currColor = myData.grid[row][col]
-                const color = colors[currColor === "r" ? 0 : 1];
+                const color = colors[myData.grid[row][col] === "r" ? 0 : 1];
 
                 const cell = this.add.circle(x, y, cellSize / 2, color);
+                cell.isBlue = myData.grid[row][col] === "r"
                 cell.setStrokeStyle(3, 0xffffff);
                 cell.currentStroke = 0xffffff;
                 cell.setInteractive();
@@ -60,12 +61,21 @@ export class Grid extends Scene {
     }
 
     handleClickCell(cell) {
-        console.log(`Clicked cell at row ${cell.row}, col ${cell.col}`);
+        console.log(`Clicked ${cell.isBlue ? "blue" : "red"} cell at row ${cell.row}, col ${cell.col}`);
+
+        if (cell.isBlue) {
+            this.dist_val--;
+        } else {
+            this.dist_val++;
+        }
 
         const isWhite = cell.currentStroke === 0xffffff;
         const newStroke = isWhite ? 0x000000 : 0xffffff;
         cell.currentStroke = newStroke;
         cell.setStrokeStyle(3, newStroke);
+
+        console.log(`curr status: ${this.dist_val}`)
+        console.log(`${this.dist_val > 0 ? "blue is winning" : "red is winning"}`)
 
         EventBus.emit('grid-cell-clicked', { row: cell.row, col: cell.col });
     }
