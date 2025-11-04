@@ -32,7 +32,8 @@ export class Grid extends Scene {
                 const currColor = myData.grid[row][col]
                 const color = colors[currColor === "r" ? 0 : 1];
 
-                const cell = this.add.rectangle(x, y, cellSize - 2, cellSize - 2, color).setStrokeStyle(3, 0xffffff);
+                const cell = this.add.circle(x, y, cellSize / 2, color);
+                cell.setStrokeStyle(3, 0xffffff);
                 cell.currentStroke = 0xffffff;
                 cell.setInteractive();
 

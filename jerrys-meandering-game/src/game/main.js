@@ -4,11 +4,11 @@ import { Grid } from './scenes/Grid';
 export default function StartGame(parent) {
     const config = {
         type: Phaser.AUTO,
-        width: 1024,
-        height: 768,
+        width: 525,
+        height: 525,
         parent,
-        backgroundColor: '#E0E0E0',
-        transparent: true, // this makes the canvas transparent
+        backgroundColor: '#ffffff',
+        // transparent: true, // this makes the canvas transparent
         scene: [Grid]
     };
 
