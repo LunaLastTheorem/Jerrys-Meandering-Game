@@ -1,19 +1,20 @@
 import { Scene } from "phaser";
 import { EventBus } from '../EventBus';
+import myData from "../../maps/map1.json"
 
 export class Grid extends Scene {
     constructor() {
         super("Grid");
     }
 
-    preload() {}
+    preload() { }
 
     create() {
         const red = 0xE9141D;
         const blue = 0x0015BC;
 
-        const rows = 8;
-        const cols = 8;
+        const rows = myData.rows;
+        const cols = myData.cols;
         const cellSize = 64;
 
         const offsetX = (this.scale.width - cols * cellSize) / 2;
@@ -28,7 +29,8 @@ export class Grid extends Scene {
                 const y = offsetY + row * cellSize + cellSize / 2;
 
                 const colors = [red, blue];
-                const color = colors[Math.floor(Math.random() * colors.length)];
+                const currColor = myData.grid[row][col]
+                const color = colors[currColor === "r" ? 0 : 1];
 
                 const cell = this.add.rectangle(x, y, cellSize - 2, cellSize - 2, color).setStrokeStyle(3, 0xffffff);
                 cell.currentStroke = 0xffffff;
