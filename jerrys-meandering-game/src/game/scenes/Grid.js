@@ -8,6 +8,7 @@ export class Grid extends Scene {
     }
 
     preload() {
+        this.dist_val = 0
         this.white = 0xFFFFFF;
         this.lightblue = 0x8091F5;
         this.lightred = 0xF48A8D;
@@ -36,12 +37,12 @@ export class Grid extends Scene {
                 const y = offsetY + row * cellSize + cellSize / 2;
 
                 const colors = [this.red, this.blue];
-                const currColor = myData.grid[row][col]
-                const color = colors[currColor === "r" ? 0 : 1];
+                const color = colors[myData.grid[row][col] === "r" ? 0 : 1];
 
                 const cell = this.add.rectangle(x, y, cellSize, cellSize, this.white);
                 const circle = this.add.circle(x, y, cellSize / 2 - 2, color);
 
+                cell.isBlue = myData.grid[row][col] === "b"
                 cell.fillColor = this.white;
                 circle.fillColor = color;
 
@@ -74,22 +75,40 @@ export class Grid extends Scene {
     }
 
     handleClickCell(cell, circle) {
-        console.log(`Clicked cell at row ${cell.row}, col ${cell.col}`);
+        console.log(`Clicked ${cell.isBlue ? "blue" : "red"} cell at row ${cell.row}, col ${cell.col}`);
 
-        // const isWhite = cell.currentStroke === 0xffffff;
-        // const newStroke = isWhite ? 0x000000 : 0xffffff;
-        // cell.currentStroke = newStroke;
-        // cell.setStrokeStyle(3, newStroke);
+        const isBlueCell = cell.isBlue;
+        const isActive = cell.fillColor === this.lightblue || cell.fillColor === this.lightred;
 
-        if (cell.fillColor === this.lightblue || cell.fillColor === this.lightred) {
+        if (isActive) {
+            if (isBlueCell) {
+                this.dist_val--;
+            } else {
+                this.dist_val++;
+            }
             cell.setFillStyle(this.white);
             cell.fillColor = this.white;
-        } else if (circle.fillColor === this.red) {
-            cell.setFillStyle(this.lightred);
-            cell.fillColor = this.lightred;
         } else {
-            cell.setFillStyle(this.lightblue);
-            cell.fillColor = this.lightblue;
+            if (isBlueCell) {
+                this.dist_val++;
+                cell.setFillStyle(this.lightblue);
+                cell.fillColor = this.lightblue;
+            } else {
+                this.dist_val--;
+                cell.setFillStyle(this.lightred);
+                cell.fillColor = this.lightred;
+            }
+        }
+
+        console.log(`curr status: ${this.dist_val}`)
+        
+        if (this.dist_val > 0) {
+            console.log("Blue is winning");
+        } else if (this.dist_val < 0) {
+            console.log("Red is winning");
+        }
+        else {
+            console.log("It's a tie");
         }
 
         EventBus.emit('grid-cell-clicked', { row: cell.row, col: cell.col });
