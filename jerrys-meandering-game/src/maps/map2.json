@@ -1,6 +1,6 @@
 {
-    "width": 3,
-    "height": 3,
+    "rows": 3,
+    "cols": 3,
     "district_size": 3,
     "grid": [
         [

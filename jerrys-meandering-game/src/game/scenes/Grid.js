@@ -1,6 +1,6 @@
 import { Scene } from "phaser";
 import { EventBus } from '../EventBus';
-import myData from "../../maps/map1.json"
+import myData from "../../maps/map3.json"
 
 export class Grid extends Scene {
     constructor() {
@@ -18,11 +18,12 @@ export class Grid extends Scene {
     }
 
     create() {
-
+        const gridSize = 300;
         const rows = myData.rows;
         const cols = myData.cols;
         this.districtSize = myData.district_size;
-        const cellSize = 64;
+        const cellSize = Math.min(gridSize / rows, gridSize / cols);
+        console.log(cellSize);
 
         const offsetX = (this.scale.width - cols * cellSize) / 2;
         const offsetY = (this.scale.height - rows * cellSize) / 2;
@@ -97,7 +98,7 @@ export class Grid extends Scene {
         }
 
         console.log(`curr status: ${this.dist_val}`)
-        
+
         if (this.dist_val > 0) {
             console.log("Blue is winning");
         } else if (this.dist_val < 0) {
