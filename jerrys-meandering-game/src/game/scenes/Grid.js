@@ -1,6 +1,8 @@
 import { Scene } from "phaser";
 import { EventBus } from '../EventBus';
-import myData from "../../maps/map3.json"
+import myData from "../../maps/map1.json";
+import { District } from "../objects/District";
+
 
 export class Grid extends Scene {
     constructor() {
@@ -15,6 +17,7 @@ export class Grid extends Scene {
         this.red = 0xE9141D;
         this.blue = 0x0015BC;
         this.selectedCells = [];
+        this.districts = [];
     }
 
     create() {
@@ -23,6 +26,7 @@ export class Grid extends Scene {
         const cols = myData.cols;
         this.districtSize = myData.district_size;
         const cellSize = Math.min(gridSize / rows, gridSize / cols);
+        this.cellSize = cellSize;
         console.log(cellSize);
 
         const offsetX = (this.scale.width - cols * cellSize) / 2;
@@ -47,24 +51,24 @@ export class Grid extends Scene {
 
                 cell.isBlue = myData.grid[row][col] === "b"
                 cell.fillColor = this.white;
+                cell.locked = false;
                 circle.fillColor = color;
 
                 cell.setInteractive();
-                circle.setInteractive();
 
                 cell.row = row;
                 cell.col = col;
                 circle.row = row;
                 circle.col = col;
 
-                circle.on('pointerover', () => {
+                cell.on('pointerover', () => {
                     circle.setAlpha(0.5);
                 });
-                circle.on('pointerout', () => {
+                cell.on('pointerout', () => {
                     circle.setAlpha(1);
                 });
 
-                circle.on("pointerdown", () => {
+                cell.on("pointerdown", () => {
                     this.handleClickCell(cell, circle);
                 });
 
@@ -78,6 +82,14 @@ export class Grid extends Scene {
     }
 
     handleClickCell(cell) {
+        if (cell.locked) {
+            const district = this.districts.find(d => d.cells.includes(cell));
+            if (district) {
+                this.clearDistrict(district);
+            }
+            return;
+        }
+
         console.log(`Clicked ${cell.isBlue ? "blue" : "red"} cell at row ${cell.row}, col ${cell.col}`);
 
         const isActive = cell.fillColor === this.lightblue || cell.fillColor === this.lightred;
@@ -149,55 +161,27 @@ export class Grid extends Scene {
             }
         }
 
-        let winningColor;
-        if (blueCount > redCount) {
-            winningColor = this.lightblue;
-        } else {
-            winningColor = this.lightred;
+        const winningColor = blueCount > redCount ? this.lightblue : this.lightred;
+
+        for (const cell of cells) {
+            cell.locked = true;
         }
 
-        this.drawDistrictBorder(cells, winningColor);
-
+        const district = new District(this, cells, winningColor);
+        this.districts.push(district);
     }
 
-    drawDistrictBorder(cells, winningColor) {
-        const g = this.add.graphics();
-        g.lineStyle(3, 0x000000, 1);
+    clearDistrict(district) {
+        district.clear();
 
-        const cellSize = 64;
-        const cellSet = new Set(cells.map(c => `${c.row},${c.col}`));
-
-        for (const cell of cells) {
-            const x = cell.x - cellSize / 2;
-            const y = cell.y - cellSize / 2;
-
-            const top = `${cell.row - 1},${cell.col}`;
-            const bottom = `${cell.row + 1},${cell.col}`;
-            const left = `${cell.row},${cell.col - 1}`;
-            const right = `${cell.row},${cell.col + 1}`;
-
-            if (!cellSet.has(top)) {
-                g.moveTo(x, y);
-                g.lineTo(x + cellSize, y);
-            }
-            if (!cellSet.has(bottom)) {
-                g.moveTo(x, y + cellSize);
-                g.lineTo(x + cellSize, y + cellSize);
-            }
-            if (!cellSet.has(left)) {
-                g.moveTo(x, y);
-                g.lineTo(x, y + cellSize);
-            }
-            if (!cellSet.has(right)) {
-                g.moveTo(x + cellSize, y);
-                g.lineTo(x + cellSize, y + cellSize);
+        const remainingDistricts = [];
+        for (const d of this.districts) {
+            if (d !== district) {
+                remainingDistricts.push(d);
             }
         }
+        this.districts = remainingDistricts;
 
-        for (const cell of cells) {
-            cell.setFillStyle(winningColor);
-            cell.fillColor = winningColor;
-        }
-        g.strokePath();
+        console.log("Cleared Districts");
     }
 }
