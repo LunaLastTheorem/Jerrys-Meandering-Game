@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { Grid } from './scenes/Grid';
+import { HomePage } from './scenes/HomePage';
+import { Levels } from './scenes/Levels';
 
 export default function StartGame(parent) {
     const config = {
@@ -9,7 +11,7 @@ export default function StartGame(parent) {
         parent,
         backgroundColor: '#ffffff',
         // transparent: true, // this makes the canvas transparent
-        scene: [Grid]
+        scene: [HomePage, Levels, Grid]
     };
 
     return new Phaser.Game(config);
