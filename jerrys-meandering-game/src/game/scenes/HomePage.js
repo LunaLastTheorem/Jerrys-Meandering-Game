@@ -20,7 +20,7 @@ export class HomePage extends Scene {
         playButton.setScale(0.5);
 
         playButton.on('pointerover', () => {
-            playButton.setAlpha(0.8);
+            playButton.setAlpha(0.5);
         });
         playButton.on('pointerout', () => {
             playButton.setAlpha(1.0);
