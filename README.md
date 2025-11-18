@@ -7,3 +7,4 @@ and a game that allows users to put the theory into practice by creating their o
 ## Contributors
 - David Luna Guitron
 - Meghan Buchanan
+- Jonathan Ochoa
