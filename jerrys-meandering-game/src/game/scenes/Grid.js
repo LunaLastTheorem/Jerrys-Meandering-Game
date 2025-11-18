@@ -12,12 +12,14 @@ export class Grid extends Scene {
     preload() {
         this.dist_val = 0
         this.white = 0xFFFFFF;
-        this.lightblue = 0xBDD5E7;
-        this.lightred = 0xFFA3A6;
+        this.lightBlue = 0xBDD5E7;
+        this.lightRed = 0xFFA3A6;
         this.red = 0xE9141D;
         this.blue = 0x0015BC;
         this.selectedCells = [];
         this.districts = [];
+        this.textSize = 20;
+        this.margin = 20;
     }
 
     create() {
@@ -78,6 +80,24 @@ export class Grid extends Scene {
             }
         }
 
+        const num_districts = (rows * cols) / this.districtSize
+        const text = `Gerrymander ${num_districts} districts each with ${this.districtSize} constituents!`
+        const colorToWin = 'red'
+
+        this.add.text(this.margin, 100, text, {
+            fontSize: this.textSize,
+            fontFamily: "monospace",
+            color: "black",
+            fontStyle: "bold"
+        })
+
+        this.add.text(this.margin, 100 + this.textSize + this.margin, `Help ${colorToWin.toUpperCase()} win!`, {
+            fontSize: this.textSize,
+            fontFamily: "monospace",
+            color: `${colorToWin == 'blue' ? "#0015BC" : "#E9141D"}`,
+            fontStyle: "bold"
+        })
+
         EventBus.emit('current-scene-ready', this);
     }
 
@@ -92,7 +112,7 @@ export class Grid extends Scene {
 
         console.log(`Clicked ${cell.isBlue ? "blue" : "red"} cell at row ${cell.row}, col ${cell.col}`);
 
-        const isActive = cell.fillColor === this.lightblue || cell.fillColor === this.lightred;
+        const isActive = cell.fillColor === this.lightBlue || cell.fillColor === this.lightRed;
 
         if (isActive) {
             this.clearCell(cell);
@@ -140,12 +160,12 @@ export class Grid extends Scene {
 
         if (isBlueCell) {
             this.dist_val++;
-            cell.setFillStyle(this.lightblue);
-            cell.fillColor = this.lightblue;
+            cell.setFillStyle(this.lightBlue);
+            cell.fillColor = this.lightBlue;
         } else {
             this.dist_val--;
-            cell.setFillStyle(this.lightred);
-            cell.fillColor = this.lightred;
+            cell.setFillStyle(this.lightRed);
+            cell.fillColor = this.lightRed;
         }
     }
 
@@ -154,14 +174,14 @@ export class Grid extends Scene {
         let redCount = 0;
 
         for (const cell of cells) {
-            if (cell.fillColor === this.lightblue) {
+            if (cell.fillColor === this.lightBlue) {
                 blueCount++;
             } else {
                 redCount++;
             }
         }
 
-        const winningColor = blueCount > redCount ? this.lightblue : this.lightred;
+        const winningColor = blueCount > redCount ? this.lightBlue : this.lightRed;
 
         for (const cell of cells) {
             cell.locked = true;
