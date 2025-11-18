@@ -1,10 +1,11 @@
 export class District {
 
-    constructor(scene, cells, winningColor) {
+    constructor(scene, cells, winningColor, gridManager) {
         this.scene = scene;
         this.cells = cells;
         this.winningColor = winningColor;
-        this.graphics = this.scene.add.graphics();
+        this.grid = gridManager
+        this.graphics = scene.add.graphics();
         this.locked = true;
 
         this.fillCells();
@@ -21,7 +22,7 @@ export class District {
 
     drawBorder() {
         const g = this.graphics;
-        const cellSize = this.scene.cellSize;
+        const cellSize = this.grid.cellSize;
         const cellSet = new Set(this.cells.map(c => `${c.row},${c.col}`));
 
         g.clear();
