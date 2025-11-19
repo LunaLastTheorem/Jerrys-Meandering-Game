@@ -2,13 +2,18 @@ import json
 from pathlib import Path
 
 maps = []
+puzzle_index = 0
 
-json_file = Path("./maps.json")
+json_file = Path("./src/maps/maps.json")
 if json_file.exists():
     print("maps file found, appending to current")
     with open(json_file, "r") as file:
         maps = json.load(file)
+        puzzle_index = maps[-1]["index"] + 1
+else:
+    print("making new json file")
 
+print(puzzle_index)
 continue_flag = "c"
 
 while len(continue_flag) == 0 or continue_flag[0] != 'q' :
@@ -35,13 +40,15 @@ while len(continue_flag) == 0 or continue_flag[0] != 'q' :
     print(curr_grid)
     
     data = {
+        "index" : puzzle_index,
         "rows" : rows,
         "cols" : cols,
-        "district_size" : district_size,
+        "districtSize" : district_size,
         "grid": curr_grid
     }
     maps.append(data)
     continue_flag = input("continue? (q to quit)")
+    puzzle_index += 1
         
 with open(json_file, "w") as f:
     json.dump(maps, f)

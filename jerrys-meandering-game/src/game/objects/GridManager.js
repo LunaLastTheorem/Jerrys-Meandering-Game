@@ -6,7 +6,7 @@ export class GridManager {
 
         this.rows = myData.rows;
         this.cols = myData.cols;
-        this.districtSize = myData.district_size;
+        this.districtSize = myData.district_size; // TODO district_size has been renamed to districtSize
         this.gridSize = 300;
 
         this.cellSize = Math.min(
