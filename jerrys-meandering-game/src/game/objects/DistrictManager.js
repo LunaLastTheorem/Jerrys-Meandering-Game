@@ -18,9 +18,9 @@ export class DistrictManager {
             }
             return;
         }
-        console.log(cell)
 
         if (this.selectedCells.length != 0 && !this.isConnected(cell, this.selectedCells)) {
+            alert("Districts must be connected")
             return;
         }
 
@@ -43,7 +43,6 @@ export class DistrictManager {
         for (const dir of dydx) {
             newCells.push([cell.row + dir[0], cell.col + dir[1]])
         }
-        console.log(newCells)
 
         for (const newCell of newCells) {
             for (const trueCell of selectedCells) {
