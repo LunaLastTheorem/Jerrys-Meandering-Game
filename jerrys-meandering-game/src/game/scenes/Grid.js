@@ -16,7 +16,9 @@ export class Grid extends Scene {
         this.districtManager = new DistrictManager(this, this.gridManager);
 
         this.buildTextUI();
-        this.buildButtons();
+        this.buildSubmitButton();
+        this.buildHomeButton();
+        this.buildLevelsButton();
     }
 
     initConstants() {
@@ -54,7 +56,7 @@ export class Grid extends Scene {
         ).setOrigin(0.5);
     }
 
-    buildButtons() {
+    buildSubmitButton() {
         const buttonY = this.gridManager.offsetY + this.gridManager.rows * this.gridManager.cellSize + 50;
         const submitButton = this.add.text(
             this.scale.width / 2, 
@@ -73,6 +75,46 @@ export class Grid extends Scene {
         .on("pointerdown", () => this.displayWon())
         .on("pointerover", () => submitButton.setAlpha(0.5))
         .on("pointerout", () => submitButton.setAlpha(1));
+    }
+
+    buildHomeButton() {
+        const homeButton = this.add.text(
+            this.scale.width * 0.45,
+            this.scale.height * 0.1,
+            "HOME",
+            {
+                fontSize: 30,
+                fontFamily: "monospace",
+                padding: { x: 14, y: 6 },
+                backgroundColor: "#000000",
+                color: "#FFFFFF"
+            }
+        )
+        .setOrigin(0.5)
+        .setInteractive()
+        .on("pointerdown", () => this.scene.start("HomePage"))
+        .on("pointerover", () => homeButton.setAlpha(0.5))
+        .on("pointerout", () => homeButton.setAlpha(1));
+    }
+
+    buildLevelsButton() {
+        const levelsButton = this.add.text(
+            this.scale.width * 0.55,
+            this.scale.height * 0.1,
+            "LEVELS",
+            {
+                fontSize: 30,
+                fontFamily: "monospace",
+                padding: { x: 14, y: 6 },
+                backgroundColor: "#000000",
+                color: "#FFFFFF"
+            }
+        )
+        .setOrigin(0.5)
+        .setInteractive()
+        .on("pointerdown", () => this.scene.start("Levels"))
+        .on("pointerover", () => levelsButton.setAlpha(0.5))
+        .on("pointerout", () => levelsButton.setAlpha(1));
     }
 
     textStyle(color) {

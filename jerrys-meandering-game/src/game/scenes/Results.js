@@ -10,7 +10,13 @@ export class Results extends Scene {
         this.color = data.color;
     }
 
+    preload() {
+        this.load.image('bg', 'assets/background.png');
+    }
+
     create() {
+        let bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg');
+        bg.setScale(4.0);
         this.buildResultsMessage();
         const card = this.buildStatsCard();
 
@@ -43,8 +49,10 @@ export class Results extends Scene {
         const y = this.scale.height * 0.35 + 50;
 
         const graphics = this.add.graphics();
-        graphics.lineStyle(3, 0x000000, 1);
+        graphics.lineStyle(8, 0x000000, 1);
+        graphics.fillStyle(0xFFFFFF, 1);
         graphics.strokeRoundedRect(x, y, cardWidth, cardHeight, 20);
+        graphics.fillRoundedRect(x, y, cardWidth, cardHeight, 20);
 
         this.add.text(
             x + cardWidth / 2,
