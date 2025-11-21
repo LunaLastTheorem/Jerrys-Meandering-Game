@@ -19,6 +19,11 @@ export class DistrictManager {
             return;
         }
 
+        if (this.selectedCells.length != 0 && !this.isConnected(cell, this.selectedCells)) {
+            alert("Districts must be connected")
+            return;
+        }
+
         const isActive = cell.fillColor === this.scene.lightBlue || cell.fillColor === this.scene.lightRed;
         isActive ? this.grid.clearCell(cell) : this.grid.colorCell(cell);
 
@@ -30,6 +35,25 @@ export class DistrictManager {
             this.formDistrict(this.selectedCells);
             this.selectedCells = [];
         }
+    }
+
+    isConnected(cell, selectedCells) {
+        const dydx = [[0, 1], [1, 0], [-1, 0], [0, -1]]
+        let newCells = []
+        for (const dir of dydx) {
+            newCells.push([cell.row + dir[0], cell.col + dir[1]])
+        }
+
+        for (const newCell of newCells) {
+            for (const trueCell of selectedCells) {
+                console.log(newCell[0], newCell[1], trueCell.row, trueCell.col);
+
+                if (newCell[0] === trueCell.row && newCell[1] === trueCell.col) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     formDistrict(cells) {
@@ -75,7 +99,7 @@ export class DistrictManager {
         for (const district of this.districts) {
             let b = 0;
             let r = 0;
-            
+
             for (const cell of district.cells) {
                 if (cell.isBlue) {
                     b++;

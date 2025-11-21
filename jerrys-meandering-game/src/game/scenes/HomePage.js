@@ -7,7 +7,7 @@ export class HomePage extends Scene {
     }
 
     preload() {
-        this.load.image('background', 'assets/gametitle.png');
+        this.load.image('background', 'assets/title.png');
         this.load.image('playButton', 'assets/startbutton.png');
     }
 
