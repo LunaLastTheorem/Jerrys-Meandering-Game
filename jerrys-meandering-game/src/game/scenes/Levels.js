@@ -7,47 +7,54 @@ export class Levels extends Scene {
     }
 
     preload() {
-        this.load.image('bg', 'assets/map.png');
-        this.load.image('levelbutton', 'assets/gerrymander.png');
+        this.load.image('bg', 'assets/background.png');
+        this.load.spritesheet('map', 'assets/states.png', { frameWidth: 283, frameHeight: 282});
     }
 
     create() {
         let bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg');
-        bg.setScale(2.5);
+        bg.setScale(4.0);
+        this.cameras.main.setBounds(0, 0, 1500, 3900);
+        this.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
+            this.cameras.main.scrollY += deltaY;
+        }, this);
         this.createLevelButtons();
 
         EventBus.emit('current-scene-ready', this);
     }
 
     createLevelButtons() {
-        const levels = 9;
-        let xOff = 700;
-        let yOff = 300;
-        const buttonSpacing = 250;
+        const levels = 49;
+        let xOff = 450;
+        let yOff = 400;
+        const buttonSpacingX = 250;
+        const buttonSpacingY = 350;
 
-        for(let i = 1; i <= levels; i++) {
-            let button = this.add.image(xOff, yOff, 'levelbutton');
-            button.setScale(0.2);
-            button.setTint(0xF6E8B1);
+        for(let i = 0; i <= levels; i++) {
+            let button = this.add.sprite(xOff, yOff, 'map', i);
+            button.setTint(0xffffff);
+            button.setScale(0.9);
             button.setInteractive();
-            this.add.text(xOff, yOff, i, { fontSize: '45px', fill: '#302' }).setOrigin(0.5);
+            let text = this.add.text(xOff - 100, yOff - 175, "Level " + (i + 1), { fontSize: '40px', fill: '#fff' }).setFontFamily("monospace");
 
             button.on('pointerover', () => {
                 button.setAlpha(0.5);
+                text.setAlpha(0.5);
             });
             button.on('pointerout', () => {
                 button.setAlpha(1.0);
+                text.setAlpha(1.0);
             });
 
             button.on('pointerdown', () => {
                 this.scene.start("Grid");
             });
 
-            xOff += buttonSpacing;
+            xOff += buttonSpacingX;
 
-            if (i % 3 === 0) {
-                xOff = 700;
-                yOff += buttonSpacing;
+            if ((i + 1) % 5 === 0) {
+                xOff = 450;
+                yOff += buttonSpacingY;
             }
         }
     }
