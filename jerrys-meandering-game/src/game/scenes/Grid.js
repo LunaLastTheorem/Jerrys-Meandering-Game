@@ -11,8 +11,10 @@ export class Grid extends Scene {
         this.initConstants();
     }
 
-    create() {
-        this.gridManager = new GridManager(this);
+    create(data) {
+        this.puzzle = data.puzzle;
+
+        this.gridManager = new GridManager(this, this.puzzle);
         this.districtManager = new DistrictManager(this, this.gridManager);
 
         this.buildTextUI();

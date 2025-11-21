@@ -14,10 +14,12 @@ export class Levels extends Scene {
     create() {
         let bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg');
         bg.setScale(4.0);
+
         this.cameras.main.setBounds(0, 0, 1500, 3900);
         this.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
             this.cameras.main.scrollY += deltaY;
         }, this);
+        
         this.createLevelButtons();
         this.createHomeButton();
 
@@ -53,6 +55,8 @@ export class Levels extends Scene {
 
         for(let i = 0; i <= levels; i++) {
             let button = this.add.sprite(xOff, yOff, 'map', i);
+            button.levelIndex = i;
+
             button.setTint(0xffffff);
             button.setScale(0.9);
             button.setInteractive();
@@ -68,7 +72,7 @@ export class Levels extends Scene {
             });
 
             button.on('pointerdown', () => {
-                this.scene.start("Grid");
+                this.startLevel(button.levelIndex);
             });
 
             xOff += buttonSpacingX;
@@ -78,6 +82,21 @@ export class Levels extends Scene {
                 yOff += buttonSpacingY;
             }
         }
+    }
+
+    startLevel(levelIndex) {
+        const url = `http://127.0.0.1:5000/puzzle/${levelIndex}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Puzzle ${levelIndex} not found`);
+                }
+                return response.json();
+            })
+            .then(puzzle => {
+                this.scene.start("Grid", { puzzle });
+            });
     }
 
 }

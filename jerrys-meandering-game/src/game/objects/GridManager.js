@@ -1,12 +1,12 @@
-import myData from "../../maps/map1.json";
-
 export class GridManager {
-    constructor(scene) {
+    constructor(scene, puzzle) {
         this.scene = scene;
+        this.puzzle = puzzle;
+        console.log(this.puzzle)
 
-        this.rows = myData.rows;
-        this.cols = myData.cols;
-        this.districtSize = myData.district_size; // TODO district_size has been renamed to districtSize
+        this.rows = puzzle.rows;
+        this.cols = puzzle.cols;
+        this.districtSize = puzzle.districtSize;
         this.gridSize = 300;
 
         this.cellSize = Math.min(
@@ -37,7 +37,7 @@ export class GridManager {
         const x = this.offsetX + col * this.cellSize + this.cellSize / 2;
         const y = this.offsetY + row * this.cellSize + this.cellSize / 2;
 
-        const isBlue = myData.grid[row][col] === "b";
+        const isBlue = this.puzzle.grid[row][col] === "b";
         const color = isBlue ? this.scene.blue : this.scene.red;
 
         const cell = this.scene.add.rectangle(
