@@ -68,7 +68,14 @@ export class DistrictManager {
             }
         }
 
-        const winningColor = blueCount > redCount ? this.scene.lightBlue : this.scene.lightRed;
+        let winningColor;
+        if (blueCount === redCount) {
+            winningColor = 0xA9A9A9;
+        } else if (blueCount > redCount) {
+            winningColor = this.scene.lightBlue;
+        } else {
+            winningColor = this.scene.lightRed;
+        }
 
         for (const cell of cells) {
             cell.locked = true;

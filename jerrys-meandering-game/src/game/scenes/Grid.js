@@ -25,7 +25,7 @@ export class Grid extends Scene {
 
     initConstants() {
         this.white = 0xFFFFFF;
-        this.lightBlue = 0xBDD5E7;
+        this.lightBlue = 0x7FBAE7FF;
         this.lightRed = 0xFFA3A6;
         this.red = 0xE9141D;
         this.blue = 0x0015BC;
@@ -39,9 +39,9 @@ export class Grid extends Scene {
 
     buildTextUI() {
         const numDistricts = (this.gridManager.rows * this.gridManager.cols) / (this.gridManager.districtSize);
-        const colorToWin = "red";
+        const colorToWin = "blue";
 
-        const topMargin = this.gridManager.offsetY / 2;
+        const topMargin = this.gridManager.offsetY / 2 + 50;
 
         this.add.text(
             this.scale.width / 2,
@@ -62,7 +62,7 @@ export class Grid extends Scene {
         const buttonY = this.gridManager.offsetY + this.gridManager.rows * this.gridManager.cellSize + 50;
         const submitButton = this.add.text(
             this.scale.width / 2, 
-            buttonY, 
+            buttonY + 50, 
             "SUBMIT", 
             {
                 fontSize: 30,
@@ -82,7 +82,7 @@ export class Grid extends Scene {
     buildHomeButton() {
         const homeButton = this.add.text(
             this.scale.width * 0.45,
-            this.scale.height * 0.1,
+            this.scale.height * 0.1 + 50,
             "HOME",
             {
                 fontSize: 30,
@@ -102,7 +102,7 @@ export class Grid extends Scene {
     buildLevelsButton() {
         const levelsButton = this.add.text(
             this.scale.width * 0.55,
-            this.scale.height * 0.1,
+            this.scale.height * 0.1 + 50,
             "LEVELS",
             {
                 fontSize: 30,
