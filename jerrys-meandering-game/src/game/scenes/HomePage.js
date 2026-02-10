@@ -30,6 +30,14 @@ export class HomePage extends Scene {
             this.scene.start("Levels");
         });
 
+        const infinityMode = this.add.image(this.cameras.main.centerX, 900, 'playButton') // PLaCE HOLDER FOR INFINITY MODE
+        infinityMode.setInteractive()
+        infinityMode.setScale(0.5)
+
+        infinityMode.on('pointerdown', () => {
+            this.scene.start("InfinityMode")
+        })
+
         EventBus.emit('current-scene-ready', this);
     }
 }
