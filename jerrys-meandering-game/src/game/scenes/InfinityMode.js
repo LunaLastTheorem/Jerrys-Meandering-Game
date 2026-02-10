@@ -15,7 +15,7 @@ export class InfinityMode extends Scene {
             "index": 0,
             "cols": 3,
             "rows": 3,
-            "district_size": 3,
+            "districtSize": 3,
             "grid": [
                 [
                     "r",
@@ -34,8 +34,6 @@ export class InfinityMode extends Scene {
                 ]
             ]
         }
-
-
         const url = `http://127.0.0.1:5000/puzzle/${0}`;
 
         fetch(url)
@@ -50,11 +48,19 @@ export class InfinityMode extends Scene {
                     console.log(data, typeof data);
                     console.log(puzzle, typeof puzzle);
 
-                    console.log(typeof puzzle == typeof data);
-
+                    for (const [key, vl] of Object.entries(data)) {
+                        if (key in puzzle) {
+                            continue
+                        }
+                        else {
+                            console.log(key, "not in", puzzle);
+                        }
+                    }
                 }
 
-                this.scene.start("Grid", { puzzle });
+                // this.scene.start("Grid", { puzzle });
             });
+
+        this.scene.start("Grid", { data });
     }
 }
