@@ -12,7 +12,7 @@ export class Grid extends Scene {
     }
 
     create(data) {
-        this.puzzle = data.puzzle;
+        this.puzzle = data.puzzle; // TODO: What does this look like?
 
         this.gridManager = new GridManager(this, this.puzzle);
         this.districtManager = new DistrictManager(this, this.gridManager);

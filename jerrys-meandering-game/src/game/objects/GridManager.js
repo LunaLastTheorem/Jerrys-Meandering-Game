@@ -1,13 +1,18 @@
-export class GridManager {
-    constructor(scene, puzzle) {
-        this.scene = scene;
-        this.puzzle = puzzle;
-        console.log(this.puzzle)
+import { Cell } from "./Cell.js";
 
+// Draws each Circle and Square cell that are on the Grid
+// Contains list of Cell objects that are on the grid
+// Colors the cell and clears as necessary
+
+export class GridManager {
+
+    constructor(scene, puzzle) {
+        this.scene = scene; // Grid Scene
+        this.puzzle = puzzle;
         this.rows = puzzle.rows;
         this.cols = puzzle.cols;
         this.districtSize = puzzle.districtSize;
-        this.gridSize = 300;
+        this.gridSize = 300; // TODO: Dont hardcode
 
         this.cellSize = Math.min(
             this.gridSize / this.rows,
@@ -17,16 +22,13 @@ export class GridManager {
         this.offsetX = (scene.scale.width - this.cols * this.cellSize) / 2;
         this.offsetY = (scene.scale.height - this.rows * this.cellSize) / 2;
 
-        this.cells = [];
-        this.circles = [];
+        this.cellList = []; // List of Cell objects
 
         this.buildGrid();
     }
 
     buildGrid() {
         for (let row = 0; row < this.rows; row++) {
-            this.cells[row] = [];
-            this.circles[row] = [];
             for (let col = 0; col < this.cols; col++) {
                 this.createCell(row, col);
             }
@@ -40,37 +42,31 @@ export class GridManager {
         const isBlue = this.puzzle.grid[row][col] === "b";
         const color = isBlue ? this.scene.blue : this.scene.red;
 
-        const cell = this.scene.add.rectangle(
+        const cellGraphic = this.scene.add.rectangle(
             x, y, this.cellSize, this.cellSize, this.scene.white
         );
 
-        const circle = this.scene.add.circle(
+        const circleGraphic = this.scene.add.circle(
             x, y, this.cellSize / 2 - 4, color
         );
 
-        cell.row = row;
-        cell.col = col;
-        cell.isBlue = isBlue;
-        cell.fillColor = this.scene.white;
-        cell.locked = false;
+        const cell = new Cell(row, col, isBlue, false, cellGraphic.fillColor, cellGraphic); // make more readable
+        this.cellList.push(cell);
 
-        cell.setInteractive();
-        cell.on("pointerdown", () => this.scene.handleClickCell(cell));
-        cell.on("pointerover", () => circle.setAlpha(0.5));
-        cell.on("pointerout", () => circle.setAlpha(1));
-
-        this.cells[row][col] = cell;
-        this.circles[row][col] = circle;
+        cellGraphic.setInteractive();
+        cellGraphic.on("pointerdown", () => this.scene.handleClickCell(cell));
+        cellGraphic.on("pointerover", () => circleGraphic.setAlpha(0.5));
+        cellGraphic.on("pointerout", () => circleGraphic.setAlpha(1));
     }
 
     colorCell(cell) {
         const color = cell.isBlue ? this.scene.lightBlue : this.scene.lightRed;
         cell.fillColor = color;
-        cell.setFillStyle(color);
+        cell.cellGraphic.setFillStyle(color);
     }
 
     clearCell(cell) {
         cell.fillColor = this.scene.white;
-        cell.setFillStyle(this.scene.white);
+        cell.cellGraphic.setFillStyle(this.scene.white);
     }
 }

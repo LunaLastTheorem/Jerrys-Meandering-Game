@@ -1,20 +1,25 @@
 import { District } from "../objects/District";
 
+// Tracks the current selected cells, forms districts, and clears districts as necessary
+// Also computes the winner at the end of the game
+
 export class DistrictManager {
     constructor(scene, gridManager) {
         this.scene = scene;
-        this.grid = gridManager;
+        this.gridManager = gridManager;
 
-        this.selectedCells = [];
+        this.selectedCells = []; // this should be the Cell object
         this.districts = [];
-        this.districtSize = this.grid.districtSize;
+        this.districtSize = this.gridManager.districtSize;
     }
 
     handleClickCell(cell) {
+        console.log(cell);
         if (cell.locked) {
             const district = this.districts.find(d => d.cells.includes(cell));
             if (district) {
                 this.clearDistrict(district);
+                console.log("District Cleared");
             }
             return;
         }
@@ -25,7 +30,7 @@ export class DistrictManager {
         }
 
         const isActive = cell.fillColor === this.scene.lightBlue || cell.fillColor === this.scene.lightRed;
-        isActive ? this.grid.clearCell(cell) : this.grid.colorCell(cell);
+        isActive ? this.gridManager.clearCell(cell) : this.gridManager.colorCell(cell);
 
         if (!this.selectedCells.includes(cell)) {
             this.selectedCells.push(cell);
@@ -81,8 +86,9 @@ export class DistrictManager {
             cell.locked = true;
         }
 
-        const district = new District(this.scene, cells, winningColor, this.grid);
+        const district = new District(this.scene, cells, winningColor, this.gridManager);
         this.districts.push(district);
+        console.log("District created: " + district);
     }
 
     clearDistrict(district) {
@@ -95,8 +101,6 @@ export class DistrictManager {
             }
         }
         this.districts = remainingDistricts;
-
-        console.log("Cleared Districts");
     }
 
     computeWinner() {
