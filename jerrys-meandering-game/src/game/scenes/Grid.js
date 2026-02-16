@@ -1,6 +1,8 @@
 import { Scene } from "phaser";
 import { GridManager } from "../objects/GridManager";
-import { DistrictManager } from "../objects/DistrictManager";
+import { GridModel } from "../models/GridModel";
+import { DistrictManager } from "../logic/DistrictManager";
+import { EventBus } from "../events/EventBus.js";
 
 export class Grid extends Scene {
     constructor() {
@@ -12,15 +14,22 @@ export class Grid extends Scene {
     }
 
     create(data) {
-        this.puzzle = data.puzzle; // TODO: What does this look like?
+        this.gridModel = new GridModel(data.puzzle);
+        this.gridManager = new GridManager(this, this.gridModel);
+        this.districtManager = new DistrictManager(this.gridModel);
 
-        this.gridManager = new GridManager(this, this.puzzle);
-        this.districtManager = new DistrictManager(this, this.gridManager);
+        EventBus.on("cell:toggled", this.onCellToggled, this);
+        EventBus.on("district:formed", this.onDistrictFormed, this);
+        EventBus.on("district:clear", this.onDistrictClear, this);
+        EventBus.on("ui:contiguous", this.onAlertContiguous, this);
 
         this.buildTextUI();
         this.buildSubmitButton();
         this.buildHomeButton();
         this.buildLevelsButton();
+
+        this.events.once("shutdown", this.cleanup, this);
+        this.events.once("destroy", this.cleanup, this);
     }
 
     initConstants() {
@@ -33,12 +42,89 @@ export class Grid extends Scene {
         this.margin = 20;
     }
 
-    handleClickCell(cell) {
-        this.districtManager.handleClickCell(cell);
+    onCellToggled({ row, col, active, isBlue }) {
+        let color = this.white;
+        if (active) {
+            if (isBlue) {
+                color = this.lightBlue;
+            } else {
+                color = this.lightRed;
+            }
+        }
+
+        this.gridManager.setCellColor(row, col, color);
+    }
+
+    onDistrictFormed(district) {
+        let color = this.white;
+        if (district.winningColor === "blue") {
+            color = this.lightBlue;
+        }
+        if (district.winningColor === "red") {
+            color = this.lightRed;
+        }
+
+        for (const cell of district.cells) {
+            this.gridManager.setCellColor(cell.row, cell.col, color);
+        }
+
+        this.drawBorder(district.cells);
+    }
+
+    onDistrictClear({ cells }) {
+        for (const cell of cells) {
+            this.gridManager.clearCell(cell.row, cell.col);
+        }
+        this.gridManager.graphics.clear();
+    }
+
+    onAlertContiguous({ message }) {
+        alert(message);
+    }
+
+    drawBorder(cells) {
+        const g = this.gridManager.graphics;
+        // g.setDepth(10); // Will make sure lines are drawn above the squares
+        
+        const cellSize = this.gridManager.cellSize;
+        const cellSet = new Set(cells.map(c => `${c.row},${c.col}`));
+        
+        g.clear();
+        g.lineStyle(3, 0x000000, 1);
+        g.beginPath();
+
+        for (const cell of cells) {
+            const rect = this.gridManager.getGraphic(cell.row, cell.col);
+            const x = rect.x - cellSize / 2;
+            const y = rect.y - cellSize / 2;
+
+            const top = `${cell.row - 1},${cell.col}`;
+            const bottom = `${cell.row + 1},${cell.col}`;
+            const left = `${cell.row},${cell.col - 1}`;
+            const right = `${cell.row},${cell.col + 1}`;
+
+            if (!cellSet.has(top)) {
+                g.moveTo(x, y);
+                g.lineTo(x + cellSize, y);
+            }
+            if (!cellSet.has(bottom)) {
+                g.moveTo(x, y + cellSize);
+                g.lineTo(x + cellSize, y + cellSize);
+            }
+            if (!cellSet.has(left)) {
+                g.moveTo(x, y);
+                g.lineTo(x, y + cellSize);
+            }
+            if (!cellSet.has(right)) {
+                g.moveTo(x + cellSize, y);
+                g.lineTo(x + cellSize, y + cellSize)
+            }
+        }
+        g.strokePath();
     }
 
     buildTextUI() {
-        const numDistricts = (this.gridManager.rows * this.gridManager.cols) / (this.gridManager.districtSize);
+        const numDistricts = (this.gridModel.rows * this.gridModel.cols) / (this.gridModel.districtSize);
         const colorToWin = "blue";
 
         const topMargin = this.gridManager.offsetY / 2 + 50;
@@ -46,7 +132,7 @@ export class Grid extends Scene {
         this.add.text(
             this.scale.width / 2,
             topMargin,
-            `Gerrymander ${numDistricts} districts each with ${this.gridManager.districtSize} constituents!`,
+            `Gerrymander ${numDistricts} districts each with ${this.gridModel.districtSize} constituents!`,
             this.textStyle("black")
         ).setOrigin(0.5);
 
@@ -59,7 +145,7 @@ export class Grid extends Scene {
     }
 
     buildSubmitButton() {
-        const buttonY = this.gridManager.offsetY + this.gridManager.rows * this.gridManager.cellSize + 50;
+        const buttonY = this.gridManager.offsetY + this.gridModel.rows * this.gridManager.cellSize + 50;
         const submitButton = this.add.text(
             this.scale.width / 2, 
             buttonY + 50, 
@@ -130,6 +216,24 @@ export class Grid extends Scene {
 
     displayWon() {
         const result = this.districtManager.computeWinner();
-        this.scene.start("Results", result);
+        let color = this.white;
+        if (result === "blue") {
+            color = this.blue;
+        }
+        if (result === "red") {
+            color = this.red;
+        }
+
+        this.scene.start("Results", { result, color });
+    }
+
+    cleanup() {
+        this.districtManager.destroy();
+
+        EventBus.off("cell:toggled", this.onCellToggled, this);
+        EventBus.off("district:formed", this.onDistrictFormed, this);
+        EventBus.off("district:clear", this.onDistrictClear, this);
+        EventBus.off("ui:contiguous", this.onAlertContiguous, this);
+
     }
 }

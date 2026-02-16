@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { EventBus } from '../EventBus';
+import { EventBus } from "../events/EventBus.js";
 
 export class InfinityMode extends Scene {
     constructor() {

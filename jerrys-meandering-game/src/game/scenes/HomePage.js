@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { EventBus } from '../EventBus';
+import { EventBus } from '../events/EventBus';
 
 export class HomePage extends Scene {
     constructor() {

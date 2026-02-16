@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
 import StartGame from './game/main';
-import { EventBus } from './game/EventBus';
+import { EventBus } from './game/events/EventBus.js';
 
 export const PhaserGame = forwardRef(function PhaserGame (props, ref) {
     
