@@ -8,7 +8,7 @@ export class Levels extends Scene {
 
     preload() {
         this.load.image('bg', 'assets/background.png');
-        this.load.spritesheet('map', 'assets/states.png', { frameWidth: 283, frameHeight: 282});
+        this.load.spritesheet('map', 'assets/states.png', { frameWidth: 283, frameHeight: 282 });
     }
 
     create() {
@@ -19,7 +19,7 @@ export class Levels extends Scene {
         this.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
             this.cameras.main.scrollY += deltaY;
         }, this);
-        
+
         this.createLevelButtons();
         this.createHomeButton();
 
@@ -39,11 +39,11 @@ export class Levels extends Scene {
                 color: "#FFFFFF"
             }
         )
-        .setOrigin(0.5)
-        .setInteractive()
-        .on("pointerdown", () => this.scene.start("HomePage"))
-        .on("pointerover", () => homeButton.setAlpha(0.5))
-        .on("pointerout", () => homeButton.setAlpha(1));
+            .setOrigin(0.5)
+            .setInteractive()
+            .on("pointerdown", () => this.scene.start("HomePage"))
+            .on("pointerover", () => homeButton.setAlpha(0.5))
+            .on("pointerout", () => homeButton.setAlpha(1));
     }
 
     createLevelButtons() {
@@ -53,7 +53,7 @@ export class Levels extends Scene {
         const buttonSpacingX = 250;
         const buttonSpacingY = 350;
 
-        for(let i = 0; i <= levels; i++) {
+        for (let i = 0; i <= levels; i++) {
             let button = this.add.sprite(xOff, yOff, 'map', i);
             button.levelIndex = i;
 

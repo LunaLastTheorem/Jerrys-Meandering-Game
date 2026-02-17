@@ -85,10 +85,10 @@ export class Grid extends Scene {
     drawBorder(cells) {
         const g = this.gridManager.graphics;
         // g.setDepth(10); // Will make sure lines are drawn above the squares
-        
+
         const cellSize = this.gridManager.cellSize;
         const cellSet = new Set(cells.map(c => `${c.row},${c.col}`));
-        
+
         g.clear();
         g.lineStyle(3, 0x000000, 1);
         g.beginPath();
@@ -147,9 +147,9 @@ export class Grid extends Scene {
     buildSubmitButton() {
         const buttonY = this.gridManager.offsetY + this.gridModel.rows * this.gridManager.cellSize + 50;
         const submitButton = this.add.text(
-            this.scale.width / 2, 
-            buttonY + 50, 
-            "SUBMIT", 
+            this.scale.width / 2,
+            buttonY + 50,
+            "SUBMIT",
             {
                 fontSize: 30,
                 fontFamily: "monospace",
@@ -158,11 +158,11 @@ export class Grid extends Scene {
                 color: "#FFFFFF"
             }
         )
-        .setOrigin(0.5)
-        .setInteractive()
-        .on("pointerdown", () => this.displayWon())
-        .on("pointerover", () => submitButton.setAlpha(0.5))
-        .on("pointerout", () => submitButton.setAlpha(1));
+            .setOrigin(0.5)
+            .setInteractive()
+            .on("pointerdown", () => this.displayWon())
+            .on("pointerover", () => submitButton.setAlpha(0.5))
+            .on("pointerout", () => submitButton.setAlpha(1));
     }
 
     buildHomeButton() {
@@ -178,11 +178,11 @@ export class Grid extends Scene {
                 color: "#FFFFFF"
             }
         )
-        .setOrigin(0.5)
-        .setInteractive()
-        .on("pointerdown", () => this.scene.start("HomePage"))
-        .on("pointerover", () => homeButton.setAlpha(0.5))
-        .on("pointerout", () => homeButton.setAlpha(1));
+            .setOrigin(0.5)
+            .setInteractive()
+            .on("pointerdown", () => this.scene.start("HomePage"))
+            .on("pointerover", () => homeButton.setAlpha(0.5))
+            .on("pointerout", () => homeButton.setAlpha(1));
     }
 
     buildLevelsButton() {
@@ -198,11 +198,11 @@ export class Grid extends Scene {
                 color: "#FFFFFF"
             }
         )
-        .setOrigin(0.5)
-        .setInteractive()
-        .on("pointerdown", () => this.scene.start("Levels"))
-        .on("pointerover", () => levelsButton.setAlpha(0.5))
-        .on("pointerout", () => levelsButton.setAlpha(1));
+            .setOrigin(0.5)
+            .setInteractive()
+            .on("pointerdown", () => this.scene.start("Levels"))
+            .on("pointerover", () => levelsButton.setAlpha(0.5))
+            .on("pointerout", () => levelsButton.setAlpha(1));
     }
 
     textStyle(color) {
