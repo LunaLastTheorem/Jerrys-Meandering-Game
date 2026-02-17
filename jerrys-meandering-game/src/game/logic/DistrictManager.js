@@ -1,5 +1,11 @@
 import { EventBus } from "../events/EventBus.js";
 
+/**
+ * This class handles the game logic rules.
+ * 
+ * It receives a signal from the Grid Scene when a cell is clicked, and updates the Grid state accordingly.
+ * It also emits different signals back to the Grid Scene when certain conditions on the board are met.
+ */
 export class DistrictManager {
     
     constructor(gridModel) {

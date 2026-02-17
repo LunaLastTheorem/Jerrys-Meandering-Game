@@ -1,5 +1,12 @@
 import { EventBus } from "../events/EventBus.js";
 
+/**
+ * This class manages what the grid looks like in the Grid Scene.
+ * 
+ * It draws the grid, changes the cell color, and clears the cell color.
+ * It also emits a signal to the Grid Scene when a cell is clicked. This triggers
+ * a UI update.
+ */
 export class GridManager {
 
     constructor(scene, gridModel) {

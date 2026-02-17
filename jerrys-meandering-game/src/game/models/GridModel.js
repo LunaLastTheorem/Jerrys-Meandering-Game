@@ -1,3 +1,7 @@
+
+/**
+ * This class represents the Grid state.
+ */
 export class GridModel {
 
     constructor(puzzle) {
