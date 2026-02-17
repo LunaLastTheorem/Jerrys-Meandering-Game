@@ -1,7 +1,7 @@
 import { EventBus } from "../events/EventBus.js";
 
 export class DistrictManager {
-    
+
     constructor(gridModel) {
         this.gridModel = gridModel;
         this.selectedCells = [];
@@ -11,7 +11,7 @@ export class DistrictManager {
         EventBus.on("cell:clicked", this.handleClickCell, this);
     }
 
-    handleClickCell({row, col}) {
+    handleClickCell({ row, col }) {
         const cell = this.gridModel.getCell(row, col);
 
         if (cell.locked) {
@@ -21,14 +21,14 @@ export class DistrictManager {
                     cell.locked = false;
                     cell.active = false;
                 }
-                EventBus.emit("district:clear", {cells: district.cells});
+                EventBus.emit("district:clear", { cells: district.cells });
                 this.districts = this.districts.filter(d => d !== district);
             }
             return;
         }
 
-        if (this.selectedCells.length !== 0 && !this.isConnected(cell)) {
-            EventBus.emit("ui:contiguous", {message: "Districts must be connected!"});
+        if (this.selectedCells.length !== 0 && !this.isConnected(cell) && !this.selectedCells.includes(cell)) {
+            EventBus.emit("ui:contiguous", { message: "Districts must be connected!" });
             return;
         }
 
@@ -71,7 +71,7 @@ export class DistrictManager {
 
     formDistrict(cells) {
         let blue = 0, red = 0;
-        
+
         for (const cell of cells) {
             cell.isBlue ? blue++ : red++;
             cell.locked = true;
@@ -122,4 +122,4 @@ export class DistrictManager {
         EventBus.off("cell:clicked", this.handleClickCell);
     }
 
- }
+}
