@@ -1,7 +1,18 @@
 import { EventBus } from "../events/EventBus.js";
 
+/**
+ * This class handles the game logic rules.
+ * 
+ * It receives a signal from the Grid Scene when a cell is clicked, and updates the Grid state accordingly.
+ * It also emits different signals back to the Grid Scene when certain conditions on the board are met.
+ */
 export class DistrictManager {
-
+    
+    /**
+     * The constructor initializes fields for this class and handles the cell:clicked signal
+     * 
+     * @param {GridModel} gridModel the game state object
+     */
     constructor(gridModel) {
         this.gridModel = gridModel;
         this.selectedCells = [];
@@ -11,7 +22,18 @@ export class DistrictManager {
         EventBus.on("cell:clicked", this.handleClickCell, this);
     }
 
-    handleClickCell({ row, col }) {
+    /**
+     * This method is called when the cell:clicked signal is sent from the EventBus. 
+     * If the cell is locked, it clears the district in which the cell is located in.
+     * If the cell is not contiguous with the other selected cells, it sends an ui:contiguous 
+     * signal via the EventBus.
+     * If the cell is the final cell selected for a district, it creates the district and locks the
+     * cells within the district.
+     * 
+     * @param {integer} row the row index of the cell clicked
+     * @param {integer} col the column index of the cell clicked
+     */
+    handleClickCell({row, col}) {
         const cell = this.gridModel.getCell(row, col);
 
         if (cell.locked) {
@@ -50,6 +72,12 @@ export class DistrictManager {
         console.log("Selected Cells:" + this.selectedCells.length);
     }
 
+    /**
+     * This is a helper method that checks for contiguity of selected cells.
+     * 
+     * @param {object} cell the cell object that was selected 
+     * @returns true if the cell is contiguous, false otherwise.
+     */
     isConnected(cell) {
         const dydx = [[0, 1], [1, 0], [-1, 0], [0, -1]]
         let newCells = []
@@ -69,6 +97,12 @@ export class DistrictManager {
         return false
     }
 
+    /**
+     * This method computes the winning color of the district and adds the district to
+     * the list of districts. It also emits the district:formed signal.
+     * 
+     * @param {object} cells the list of cells in the district
+     */
     formDistrict(cells) {
         let blue = 0, red = 0;
 
@@ -92,6 +126,11 @@ export class DistrictManager {
         EventBus.emit("district:formed", district);
     }
 
+    /**
+     * This method determines the winning party (red, blue, tie) of the entire grid.
+     * 
+     * @returns a string with the winning color in all lowercase, or tie if there is no winner
+     */
     computeWinner() {
         let blueWins = 0, redWins = 0, tie = 0;
 
@@ -118,6 +157,9 @@ export class DistrictManager {
         }
     }
 
+    /**
+     * This method destroys the cell:clicked event in the EventBus when a new Scene is loaded.
+     */
     destroy() {
         EventBus.off("cell:clicked", this.handleClickCell);
     }
