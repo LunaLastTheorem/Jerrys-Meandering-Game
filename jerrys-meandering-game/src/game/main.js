@@ -12,6 +12,7 @@ export default function StartGame(parent) {
         height: 1080,
         scale: {
             mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH
         },
         parent,
         backgroundColor: '#ffffff',
