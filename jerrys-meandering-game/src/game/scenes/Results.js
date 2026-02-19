@@ -8,6 +8,8 @@ export class Results extends Scene {
     init(data) {
         this.message = data.message;
         this.color = data.color;
+        this.infinityModeFlag = data.infinityModeFlag
+        console.log(this.infinityModeFlag)
     }
 
     preload() {
@@ -23,7 +25,13 @@ export class Results extends Scene {
         const buttonY = card.y + card.height + 50;
         this.buildReplayButton(this.scale.width * 0.40, buttonY);
         this.buildHomeButton(this.scale.width * 0.5, buttonY);
-        this.buildLevelsButton(this.scale.width * 0.60, buttonY);
+
+        if (!this.infinityModeFlag) {
+            this.buildLevelsButton(this.scale.width * 0.60, buttonY);
+        }
+        else {
+            // TODO next Level button
+        }
     }
 
     buildResultsMessage() {
@@ -38,7 +46,7 @@ export class Results extends Scene {
                 fontStyle: "bold"
             }
         )
-        .setOrigin(0.5);
+            .setOrigin(0.5);
     }
 
     buildStatsCard() {
@@ -66,7 +74,7 @@ export class Results extends Scene {
                 fontStyle: "bold"
             }
         )
-        .setOrigin(0.5);
+            .setOrigin(0.5);
 
         const statsText = "Moves: 12\n Time: 30sec\n Stars: ***"
         this.add.text(
@@ -80,7 +88,7 @@ export class Results extends Scene {
                 align: "center",
             }
         )
-        .setOrigin(0.5);
+            .setOrigin(0.5);
 
         return { x, y, width: cardWidth, height: cardHeight };
     }
@@ -98,11 +106,11 @@ export class Results extends Scene {
                 color: "#FFFFFF"
             }
         )
-        .setOrigin(0.5)
-        .setInteractive()
-        .on("pointerdown", () => this.scene.start("HomePage"))
-        .on("pointerover", () => homeButton.setAlpha(0.5))
-        .on("pointerout", () => homeButton.setAlpha(1));
+            .setOrigin(0.5)
+            .setInteractive()
+            .on("pointerdown", () => this.scene.start("HomePage"))
+            .on("pointerover", () => homeButton.setAlpha(0.5))
+            .on("pointerout", () => homeButton.setAlpha(1));
     }
 
     buildLevelsButton(x, y) {
@@ -118,11 +126,11 @@ export class Results extends Scene {
                 color: "#FFFFFF"
             }
         )
-        .setOrigin(0.5)
-        .setInteractive()
-        .on("pointerdown", () => this.scene.start("Levels"))
-        .on("pointerover", () => levelsButton.setAlpha(0.5))
-        .on("pointerout", () => levelsButton.setAlpha(1));
+            .setOrigin(0.5)
+            .setInteractive()
+            .on("pointerdown", () => this.scene.start("Levels"))
+            .on("pointerover", () => levelsButton.setAlpha(0.5))
+            .on("pointerout", () => levelsButton.setAlpha(1));
     }
 
     buildReplayButton(x, y) {
@@ -138,11 +146,11 @@ export class Results extends Scene {
                 color: "#FFFFFF"
             }
         )
-        .setOrigin(0.5)
-        .setInteractive()
-        .on("pointerdown", () => this.scene.start("Grid"))
-        .on("pointerover", () => levelsButton.setAlpha(0.5))
-        .on("pointerout", () => levelsButton.setAlpha(1));
+            .setOrigin(0.5)
+            .setInteractive()
+            .on("pointerdown", () => this.scene.start("Grid"))
+            .on("pointerover", () => levelsButton.setAlpha(0.5))
+            .on("pointerout", () => levelsButton.setAlpha(1));
     }
 
 }

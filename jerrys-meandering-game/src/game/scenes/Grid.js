@@ -287,6 +287,7 @@ export class Grid extends Scene {
      */
     displayWon() {
         const result = this.districtManager.computeWinner();
+        const infinityModeFlag = false // TODO UNHRDCODE THIS-
         let color = this.white;
         if (result === "blue") {
             color = this.blue;
@@ -295,7 +296,7 @@ export class Grid extends Scene {
             color = this.red;
         }
 
-        this.scene.start("Results", { result, color });
+        this.scene.start("Results", { result, color, infinityModeFlag });
     }
 
     /**
