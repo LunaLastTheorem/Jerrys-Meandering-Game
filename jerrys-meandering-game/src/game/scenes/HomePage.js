@@ -13,7 +13,7 @@ export class HomePage extends Scene {
 
     create() {
         let back = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
-        back.setScale(1.6);
+        back.setScale(2.0);
 
         const playButton = this.add.image(this.cameras.main.centerX, 800, 'playButton');
         playButton.setInteractive();

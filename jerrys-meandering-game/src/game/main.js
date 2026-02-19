@@ -10,6 +10,9 @@ export default function StartGame(parent) {
         type: Phaser.AUTO,
         width: 1920,
         height: 1080,
+        scale: {
+            mode: Phaser.Scale.FIT,
+        },
         parent,
         backgroundColor: '#ffffff',
         // transparent: true, // this makes the canvas transparent

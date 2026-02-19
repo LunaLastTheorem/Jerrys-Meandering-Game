@@ -15,7 +15,7 @@ export class Levels extends Scene {
         let bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg');
         bg.setScale(4.0);
 
-        this.cameras.main.setBounds(0, 0, 1500, 3900);
+        this.cameras.main.setBounds(0, 0, 1500, 3800);
         this.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
             this.cameras.main.scrollY += deltaY;
         }, this);
