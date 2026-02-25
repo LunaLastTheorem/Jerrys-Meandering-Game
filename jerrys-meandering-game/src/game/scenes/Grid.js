@@ -31,6 +31,7 @@ export class Grid extends Scene {
         this.gridModel = new GridModel(data.puzzle);
         this.gridManager = new GridManager(this, this.gridModel);
         this.districtManager = new DistrictManager(this.gridModel);
+        this.activeDistricts = []; // Track all active districts for border management
 
         EventBus.on("cell:toggled", this.onCellToggled, this);
         EventBus.on("district:formed", this.onDistrictFormed, this);
@@ -104,12 +105,14 @@ export class Grid extends Scene {
             this.gridManager.setCellColor(cell.row, cell.col, color);
         }
 
-        this.drawBorder(district.cells);
+        // Add district to tracking list and redraw all borders
+        this.activeDistricts.push(district);
+        this.redrawAllBorders();
     }
 
     /**
      * This method is called when a district is cleared. It visually resets the color of the cell
-     * to white using the GridManager.
+     * to white using the GridManager and removes the district border.
      * 
      * @param {object} cells This is the list of cells in a district that need to be cleared. 
      */
@@ -117,7 +120,17 @@ export class Grid extends Scene {
         for (const cell of cells) {
             this.gridManager.clearCell(cell.row, cell.col);
         }
+
+        // Find and remove the district from tracking list
+        this.activeDistricts = this.activeDistricts.filter(d => {
+            const cellSet = new Set(d.cells.map(c => `${c.row},${c.col}`));
+            const clearCellSet = new Set(cells.map(c => `${c.row},${c.col}`));
+            return !Array.from(cellSet).every(cell => clearCellSet.has(cell));
+        });
+
+        // Clear graphics and redraw remaining borders
         this.gridManager.graphics.clear();
+        this.redrawAllBorders();
     }
 
     /**
@@ -131,22 +144,36 @@ export class Grid extends Scene {
     }
 
     /**
-     * This is a helper method to onDistrictFormed. It uses the GridManager's graphics object to draw
-     * a border around a district. 
-     * 
-     * @param {object} cells This is the list of cells to draw the border around. Each cell has a row,
-     * column.
+     * Redraws all active district borders. This method clears the graphics object once and then
+     * draws borders for all active districts to ensure no borders are accidentally cleared.
+     * The graphics object is set to depth 10 to ensure borders render above the grid cells.
      */
-    drawBorder(cells) {
+    redrawAllBorders() {
         const g = this.gridManager.graphics;
-        // g.setDepth(10); // Will make sure lines are drawn above the squares
-
-        const cellSize = this.gridManager.cellSize;
-        const cellSet = new Set(cells.map(c => `${c.row},${c.col}`));
-
+        g.setDepth(10); // Ensure lines are drawn above the squares
         g.clear();
         g.lineStyle(3, 0x000000, 1);
         g.beginPath();
+
+        for (const district of this.activeDistricts) {
+            this.drawBorderLines(g, district.cells);
+        }
+
+        g.strokePath();
+    }
+
+    /**
+     * Helper method for redrawAllBorders that draws the border lines for a single district.
+     * This method draws lines on all edges of a district's cells that are not adjacent to another
+     * cell in the same district, creating a complete border around the district perimeter.
+     * 
+     * @param {object} graphics The Phaser graphics object to draw the border on
+     * @param {array} cells An array of cell objects representing the district. Each cell has
+     * row and col properties indicating its position in the grid.
+     */
+    drawBorderLines(graphics, cells) {
+        const cellSize = this.gridManager.cellSize;
+        const cellSet = new Set(cells.map(c => `${c.row},${c.col}`));
 
         for (const cell of cells) {
             const rect = this.gridManager.getGraphic(cell.row, cell.col);
@@ -159,23 +186,22 @@ export class Grid extends Scene {
             const right = `${cell.row},${cell.col + 1}`;
 
             if (!cellSet.has(top)) {
-                g.moveTo(x, y);
-                g.lineTo(x + cellSize, y);
+                graphics.moveTo(x, y);
+                graphics.lineTo(x + cellSize, y);
             }
             if (!cellSet.has(bottom)) {
-                g.moveTo(x, y + cellSize);
-                g.lineTo(x + cellSize, y + cellSize);
+                graphics.moveTo(x, y + cellSize);
+                graphics.lineTo(x + cellSize, y + cellSize);
             }
             if (!cellSet.has(left)) {
-                g.moveTo(x, y);
-                g.lineTo(x, y + cellSize);
+                graphics.moveTo(x, y);
+                graphics.lineTo(x, y + cellSize);
             }
             if (!cellSet.has(right)) {
-                g.moveTo(x + cellSize, y);
-                g.lineTo(x + cellSize, y + cellSize)
+                graphics.moveTo(x + cellSize, y);
+                graphics.lineTo(x + cellSize, y + cellSize);
             }
         }
-        g.strokePath();
     }
 
     /**
