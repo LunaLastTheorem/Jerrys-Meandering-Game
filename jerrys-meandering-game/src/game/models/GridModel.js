@@ -23,6 +23,7 @@ export class GridModel {
         this.rows = puzzle.rows;
         this.cols = puzzle.cols;
         this.districtSize = puzzle.districtSize;
+        this.whoWins = puzzle.whoWins
 
         this.cells = [];
 
