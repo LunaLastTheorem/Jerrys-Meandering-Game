@@ -13,10 +13,10 @@ if json_file.exists():
 else:
     print("making new json file")
 
-print(puzzle_index)
 continue_flag = "c"
 
 while len(continue_flag) == 0 or continue_flag[0] != 'q' :
+    print(f"puzzle number {puzzle_index}")
     try:
         rows = int(input("rows? "))
         cols = int(input("cols? "))
@@ -25,6 +25,7 @@ while len(continue_flag) == 0 or continue_flag[0] != 'q' :
         if len(colors_string) != rows * cols:
             print("number of colors is not the same as the size of the grid")
             break
+        who_wins = str(input("Who wins? (r or b)"))
     except ValueError as e:
         print(f"Error found, saving progress... \n{e}")
         break
@@ -44,8 +45,10 @@ while len(continue_flag) == 0 or continue_flag[0] != 'q' :
         "rows" : rows,
         "cols" : cols,
         "districtSize" : district_size,
-        "grid": curr_grid
+        "grid": curr_grid,
+        "whoWins" : who_wins
     }
+
     maps.append(data)
     continue_flag = input("continue? (q to quit)")
     puzzle_index += 1
