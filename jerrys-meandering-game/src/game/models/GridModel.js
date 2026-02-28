@@ -24,6 +24,7 @@ export class GridModel {
         this.cols = puzzle.cols;
         this.districtSize = puzzle.districtSize;
         this.whoWins = puzzle.whoWins
+        this.totalDistricts = (this.rows * this.cols) / this.districtSize;
 
         this.cells = [];
 

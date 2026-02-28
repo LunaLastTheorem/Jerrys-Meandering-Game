@@ -9,7 +9,9 @@ export class Results extends Scene {
         this.message = data.message;
         this.color = data.color;
         this.infinityModeFlag = data.infinityModeFlag
+        this.metrics = data.metrics;
         console.log(this.infinityModeFlag)
+        console.log("Metrics:", this.metrics);
     }
 
     preload() {
@@ -51,7 +53,7 @@ export class Results extends Scene {
 
     buildStatsCard() {
         const cardWidth = this.scale.width / 5;
-        const cardHeight = this.scale.height / 4;
+        const cardHeight = this.scale.height / 3;
 
         const x = (this.scale.width - cardWidth) / 2;
         const y = this.scale.height * 0.35 + 50;
@@ -64,10 +66,10 @@ export class Results extends Scene {
 
         this.add.text(
             x + cardWidth / 2,
-            y + 50,
-            "RESULTS",
+            y + 30,
+            "METRICS",
             {
-                fontSize: 35,
+                fontSize: 30,
                 fontFamily: "monospace",
                 color: "#000000",
                 align: "center",
@@ -76,16 +78,28 @@ export class Results extends Scene {
         )
             .setOrigin(0.5);
 
-        const statsText = "Moves: 12\n Time: 30sec\n Stars: ***"
+        // Build stats text based on whether metrics exist
+        let statsText = "";
+        if (this.metrics) {
+            const eg = this.metrics.efficiency_gap || 0;
+            const pp = this.metrics.polsby_popper?.average_ratio || 0;
+            
+            // Format the text with metric values
+            statsText = `Efficiency Gap:\n${eg.toFixed(3)}\n\nCompactness Ratio:\n${pp.toFixed(3)}`;
+        } else {
+            statsText = "Metrics\nunavailable";
+        }
+
         this.add.text(
             x + cardWidth / 2,
-            y + cardHeight / 2,
+            y + cardHeight / 2 + 20,
             statsText,
             {
-                fontSize: 25,
+                fontSize: 20,
                 fontFamily: "monospace",
                 color: "#000000",
                 align: "center",
+                lineSpacing: 5
             }
         )
             .setOrigin(0.5);

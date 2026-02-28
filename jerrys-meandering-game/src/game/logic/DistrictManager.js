@@ -12,11 +12,12 @@ export class DistrictManager {
      * The constructor initializes fields for this class and handles the cell:clicked signal
      * 
      * @param {GridModel} gridModel the game state object
+     * @param {DistrictModel} districtModel the district state object
      */
-    constructor(gridModel) {
+    constructor(gridModel, districtModel) {
         this.gridModel = gridModel;
+        this.districtModel = districtModel;
         this.selectedCells = [];
-        this.districts = [];
         this.districtSize = gridModel.districtSize;
 
         EventBus.on("cell:clicked", this.handleClickCell, this);
@@ -37,14 +38,15 @@ export class DistrictManager {
         const cell = this.gridModel.getCell(row, col);
 
         if (cell.locked) {
-            const district = this.districts.find(d => d.cells.includes(cell));
+            const districts = this.districtModel.getDistricts();
+            const district = districts.find(d => d.cells.includes(cell));
             if (district) {
                 for (const cell of district.cells) {
                     cell.locked = false;
                     cell.active = false;
                 }
                 EventBus.emit("district:clear", { cells: district.cells });
-                this.districts = this.districts.filter(d => d !== district);
+                this.districtModel.removeDistrict(district);
             }
             return;
         }
@@ -99,7 +101,7 @@ export class DistrictManager {
 
     /**
      * This method computes the winning color of the district and adds the district to
-     * the list of districts. It also emits the district:formed signal.
+     * the DistrictModel. It also emits the district:formed signal.
      * 
      * @param {object} cells the list of cells in the district
      */
@@ -121,7 +123,7 @@ export class DistrictManager {
         }
 
         const district = { cells, winningColor };
-        this.districts.push(district);
+        this.districtModel.addDistrict(district);
 
         EventBus.emit("district:formed", district);
     }
@@ -133,8 +135,9 @@ export class DistrictManager {
      */
     computeWinner() {
         let blueWins = 0, redWins = 0, tie = 0;
+        const districts = this.districtModel.getDistricts();
 
-        for (const district of this.districts) {
+        for (const district of districts) {
             let b = 0, r = 0;
             for (const cell of district.cells) {
                 cell.isBlue ? b++ : r++;

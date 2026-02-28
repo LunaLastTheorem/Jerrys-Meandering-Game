@@ -1,8 +1,10 @@
 import { Scene } from "phaser";
 import { GridManager } from "../objects/GridManager";
 import { GridModel } from "../models/GridModel";
+import { DistrictModel } from "../models/DistrictModel";
 import { DistrictManager } from "../logic/DistrictManager";
 import { EventBus } from "../events/EventBus.js";
+import { PuzzleSubmissionService } from "../services/PuzzleSubmissionService.js";
 
 /**
  * This class is a Phaser Scene object that creates what the main game mode displays.
@@ -29,8 +31,10 @@ export class Grid extends Scene {
      */
     create(data) {
         this.gridModel = new GridModel(data.puzzle);
+        this.districtModel = new DistrictModel();
         this.gridManager = new GridManager(this, this.gridModel);
-        this.districtManager = new DistrictManager(this.gridModel);
+        this.districtManager = new DistrictManager(this.gridModel, this.districtModel);
+        this.submissionService = new PuzzleSubmissionService();
         this.activeDistricts = []; // Track all active districts for border management
 
         EventBus.on("cell:toggled", this.onCellToggled, this);
@@ -308,21 +312,92 @@ export class Grid extends Scene {
     }
 
     /**
-     * This method is called when the user selects the submit button. It calls the computeWinner() method
-     * in the DistrictManager and starts the Results page with the winner and it's color. 
+     * This method is called when the user selects the submit button. It validates the puzzle,
+     * submits it to the backend API via the PuzzleSubmissionService, and starts the Results scene
+     * with the computed metrics.
+     * 
+     * @returns {Promise<void>}
      */
-    displayWon() {
-        const result = this.districtManager.computeWinner();
-        const infinityModeFlag = false // TODO UNHRDCODE THIS-
-        let color = this.white;
-        if (result === "blue") {
-            color = this.blue;
-        }
-        if (result === "red") {
-            color = this.red;
+    async displayWon() {
+        // Validate that all districts are filled
+        if (this.districtManager.districtModel.getDistrictCount() !== this.gridModel.totalDistricts) {
+            alert(`Please fill all ${this.gridModel.totalDistricts} districts!`);
+            return;
         }
 
-        this.scene.start("Results", { result, color, infinityModeFlag });
+        try {
+            // Format districts for API
+            const payload = this.formatDistrictsForAPI();
+            
+            // Submit puzzle via service
+            const metricsResult = await this.submissionService.submitPuzzle(payload);
+            
+            // Compute winner for display purposes
+            const winner = this.districtManager.computeWinner();
+            let color = this.white;
+            if (winner === "blue") {
+                color = this.blue;
+            } else if (winner === "red") {
+                color = this.red;
+            }
+
+            // Start Results scene with metrics
+            this.scene.start("Results", { 
+                result: winner, 
+                color,
+                infinityModeFlag: false,
+                metrics: metricsResult
+            });
+
+        } catch (error) {
+            console.error("Error submitting puzzle:", error);
+            alert("Error submitting puzzle. Please check the console.");
+        }
+    }
+
+    /**
+     * Helper method to format districts into the API payload format.
+     * 
+     * @returns {object} Formatted payload for the API
+     */
+    formatDistrictsForAPI() {
+        const districts = this.districtManager.districtModel.getDistricts();
+        const formattedDistricts = [];
+        let totalVotesA = 0;
+        let totalVotesB = 0;
+
+        for (let i = 0; i < districts.length; i++) {
+            const district = districts[i];
+            let votesA = 0;
+            let votesB = 0;
+            const cells = [];
+
+            for (const cell of district.cells) {
+                cells.push([cell.row, cell.col]);
+                if (cell.isBlue) {
+                    votesA++;
+                } else {
+                    votesB++;
+                }
+            }
+
+            totalVotesA += votesA;
+            totalVotesB += votesB;
+
+            formattedDistricts.push({
+                id: i,
+                cells: cells,
+                votes_party_a: votesA,
+                votes_party_b: votesB
+            });
+        }
+
+        return {
+            puzzle_id: 0, // TODO: Get actual puzzle ID if needed
+            districts: formattedDistricts,
+            total_votes_party_a: totalVotesA,
+            total_votes_party_b: totalVotesB
+        };
     }
 
     /**
