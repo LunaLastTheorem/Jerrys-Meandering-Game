@@ -8,7 +8,8 @@ export class HomePage extends Scene {
 
     preload() {
         this.load.image('background', 'assets/title.png');
-        this.load.image('playButton', 'assets/startbutton.png');
+        this.load.image('playButton', 'assets/start.png');
+        this.load.image('unlimitedButton', 'assets/unlimited.png');
     }
 
     create() {
@@ -17,7 +18,7 @@ export class HomePage extends Scene {
 
         const playButton = this.add.image(this.cameras.main.centerX, 800, 'playButton');
         playButton.setInteractive();
-        playButton.setScale(0.5);
+        playButton.setScale(0.4);
 
         playButton.on('pointerover', () => {
             playButton.setAlpha(0.5);
@@ -30,10 +31,17 @@ export class HomePage extends Scene {
             this.scene.start("Levels");
         });
 
-        const infinityMode = this.add.image(this.cameras.main.centerX, 900, 'playButton') // PLaCE HOLDER FOR INFINITY MODE
+        const infinityMode = this.add.image(this.cameras.main.centerX, 950, 'unlimitedButton') // PLaCE HOLDER FOR INFINITY MODE
         infinityMode.setInteractive()
-        infinityMode.setScale(0.5)
+        infinityMode.setScale(0.4)
 
+        infinityMode.on('pointerover', () => {
+            infinityMode.setAlpha(0.5);
+        });
+        infinityMode.on('pointerout', () => {
+            infinityMode.setAlpha(1.0);
+        });
+        
         infinityMode.on('pointerdown', () => {
             this.scene.start("InfinityMode")
         })

@@ -53,27 +53,35 @@ export class Levels extends Scene {
         const buttonSpacingX = 250;
         const buttonSpacingY = 350;
 
+        const unlockedLevel = this.getUnlockedLevel();
+
         for (let i = 0; i <= levels; i++) {
             let button = this.add.sprite(xOff, yOff, 'map', i);
             button.levelIndex = i;
 
-            button.setTint(0xffffff);
             button.setScale(0.9);
-            button.setInteractive();
             let text = this.add.text(xOff - 100, yOff - 175, "Level " + (i + 1), { fontSize: '40px', fill: '#fff' }).setFontFamily("monospace");
 
-            button.on('pointerover', () => {
-                button.setAlpha(0.5);
+            if (i > unlockedLevel) {
+                button.setTint(0x555555);
+                button.disableInteractive();
                 text.setAlpha(0.5);
-            });
-            button.on('pointerout', () => {
-                button.setAlpha(1.0);
-                text.setAlpha(1.0);
-            });
+            } else {
+                button.setInteractive();
 
-            button.on('pointerdown', () => {
-                this.startLevel(button.levelIndex);
-            });
+                button.on('pointerover', () => {
+                    button.setAlpha(0.5);
+                    text.setAlpha(0.5);
+                });
+                button.on('pointerout', () => {
+                    button.setAlpha(1.0);
+                    text.setAlpha(1.0);
+                });
+    
+                button.on('pointerdown', () => {
+                    this.startLevel(button.levelIndex);
+                });
+            }
 
             xOff += buttonSpacingX;
 
@@ -81,6 +89,18 @@ export class Levels extends Scene {
                 xOff = 450;
                 yOff += buttonSpacingY;
             }
+        }
+    }
+
+    getUnlockedLevel() {
+        const saved = localStorage.getItem("unlockedLevel");
+        return saved ? parseInt(saved) : 0;
+    }
+
+    unlockNextLevel(levelIndex) {
+        const currentUnlocked = this.getUnlockedLevel();
+        if (levelIndex >= currentUnlocked) {
+            localStorage.setItem("unlockedLevel", levelIndex + 1);
         }
     }
 

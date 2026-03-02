@@ -30,6 +30,7 @@ export class Grid extends Scene {
      * @param {object} data An object that has a puzzle object. Each puzzle object has an index, rows, cols, and districtSize.
      */
     create(data) {
+        this.currentLevelIndex = data.puzzle.index;
         this.gridModel = new GridModel(data.puzzle);
         this.districtModel = new DistrictModel();
         this.gridManager = new GridManager(this, this.gridModel);
@@ -339,6 +340,13 @@ export class Grid extends Scene {
                 color = this.blue;
             } else if (winner === "red") {
                 color = this.red;
+            }
+
+            const saved = localStorage.getItem("unlockedLevel");
+            const unlockedLevel = saved ? parseInt(saved) : 0;
+
+            if (this.currentLevelIndex >= unlockedLevel) {
+                localStorage.setItem("unlockedLevel", this.currentLevelIndex + 1);
             }
 
             // Start Results scene with metrics
