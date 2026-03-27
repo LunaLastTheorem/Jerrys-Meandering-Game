@@ -6,6 +6,7 @@ import os, certifi
 from dotenv import load_dotenv
 from datetime import datetime
 from metrics import compute_metrics
+from map_generator import generate_puzzle
 
 app = Flask(__name__, static_url_path="", static_folder='../dist', template_folder='../dist')
 CORS(app, origins=["http://localhost:8080"])
@@ -16,6 +17,19 @@ uri = os.getenv("URI")
 client = MongoClient(uri, tlsCAFile=certifi.where(), server_api=ServerApi("1"))
 db = client['jerrys-meandering-game']
 collection = db['maps']
+
+@app.route("/puzzle/<int:w>/<int:h>", methods = ['GET'])
+def create_puzzle(w = None, h = None):
+    '''
+    Call this to make a new puzzle :D
+    '''
+    if not w or not h:
+        return jsonify({"error": "Missing Dimension"}), 404
+    try:
+        puzzle = generate_puzzle(w, h)
+    except TypeError:
+        return jsonify({"error": "Invalid Dimension"}), 500
+    return jsonify(puzzle)
 
 @app.route("/puzzle/<int:index>", methods=["GET"])
 def get_puzzle(index):
