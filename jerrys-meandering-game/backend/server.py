@@ -6,7 +6,7 @@ import os, certifi
 from dotenv import load_dotenv
 from datetime import datetime
 from metrics import compute_metrics
-from map_generator import generate_puzzle
+from map_generator import generate_puzzle, generate_multiplayer_puzzle
 
 app = Flask(__name__, static_url_path="", static_folder='../dist', template_folder='../dist')
 CORS(app, origins=["http://localhost:8080"])
@@ -18,17 +18,27 @@ client = MongoClient(uri, tlsCAFile=certifi.where(), server_api=ServerApi("1"))
 db = client['jerrys-meandering-game']
 collection = db['maps']
 
-@app.route("/puzzle/<int:w>/<int:h>", methods = ['GET'])
-def create_puzzle(w = None, h = None):
+@app.route("/puzzle/multiplayer/<int:rows>/<int:cols>", methods = ['GET'])
+def create_multiplayer_puzzle(rows = None, cols = None):
+    if not rows or not cols:
+        return jsonify({"error": "Missing Dimension"}), 404
+    try:
+        puzzle = generate_multiplayer_puzzle(rows, cols)
+    except TypeError:
+        return jsonify({"error": f"Invalid Dimension {rows} x {cols}"}), 500
+    return jsonify(puzzle)
+
+@app.route("/puzzle/<int:rows>/<int:cols>", methods = ['GET'])
+def create_puzzle(rows = None, cols = None):
     '''
     Call this to make a new puzzle :D
     '''
-    if not w or not h:
+    if not rows or not cols:
         return jsonify({"error": "Missing Dimension"}), 404
     try:
-        puzzle = generate_puzzle(w, h)
+        puzzle = generate_puzzle(rows, cols)
     except TypeError:
-        return jsonify({"error": "Invalid Dimension"}), 500
+        return jsonify({"error": f"Invalid Dimension {rows} x {cols}"}), 500
     return jsonify(puzzle)
 
 @app.route("/puzzle/<int:index>", methods=["GET"])

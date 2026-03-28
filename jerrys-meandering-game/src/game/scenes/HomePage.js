@@ -16,9 +16,9 @@ export class HomePage extends Scene {
         let back = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
         back.setScale(2.0);
 
-        const playButton = this.add.image(this.cameras.main.centerX, 800, 'playButton');
+        const playButton = this.add.image(this.cameras.main.centerX, 750, 'playButton');
         playButton.setInteractive();
-        playButton.setScale(0.4);
+        playButton.setScale(0.35);
 
         playButton.on('pointerover', () => {
             playButton.setAlpha(0.5);
@@ -31,9 +31,9 @@ export class HomePage extends Scene {
             this.scene.start("Levels");
         });
 
-        const infinityMode = this.add.image(this.cameras.main.centerX, 950, 'unlimitedButton') // PLaCE HOLDER FOR INFINITY MODE
+        const infinityMode = this.add.image(this.cameras.main.centerX, 875, 'unlimitedButton')
         infinityMode.setInteractive()
-        infinityMode.setScale(0.4)
+        infinityMode.setScale(0.35)
 
         infinityMode.on('pointerover', () => {
             infinityMode.setAlpha(0.5);
@@ -41,9 +41,24 @@ export class HomePage extends Scene {
         infinityMode.on('pointerout', () => {
             infinityMode.setAlpha(1.0);
         });
-        
+
         infinityMode.on('pointerdown', () => {
             this.scene.start("InfinityMode")
+        })
+        
+        const multiplayerMode = this.add.image(this.cameras.main.centerX, 1000, 'unlimitedButton') // Placeholder for multiplayer
+        multiplayerMode.setInteractive()
+        multiplayerMode.setScale(0.35)
+        
+        multiplayerMode.on('pointerover', () => {
+            multiplayerMode.setAlpha(0.5);
+        });
+        multiplayerMode.on('pointerout', () => {
+            multiplayerMode.setAlpha(1.0);
+        });
+        
+        multiplayerMode.on('pointerdown', () => {
+            this.scene.start("MultiplayerMode")
         })
 
         EventBus.emit('current-scene-ready', this);
