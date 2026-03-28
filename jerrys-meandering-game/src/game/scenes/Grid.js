@@ -81,11 +81,7 @@ export class Grid extends Scene {
     onCellToggled({ row, col, active, isBlue }) {
         let color = this.white;
         if (active) {
-            if (isBlue) {
-                color = this.lightBlue;
-            } else {
-                color = this.lightRed;
-            }
+            color = isBlue ? this.lightBlue : this.lightRed;
         }
 
         this.gridManager.setCellColor(row, col, color);

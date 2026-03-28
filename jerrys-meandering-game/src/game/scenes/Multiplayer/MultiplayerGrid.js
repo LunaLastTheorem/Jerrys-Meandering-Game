@@ -1,18 +1,11 @@
 import { Scene } from "phaser";
-import { GridManager } from "../objects/GridManager";
-import { GridModel } from "../models/GridModel";
-import { DistrictModel } from "../models/DistrictModel";
-import { DistrictManager } from "../logic/DistrictManager";
-import { EventBus } from "../events/EventBus.js";
-import { PuzzleSubmissionService } from "../services/PuzzleSubmissionService.js";
+import { GridManager } from "../../objects/GridManager.js";
+import { GridModel } from "../../models/GridModel.js";
+import { DistrictModel } from "../../models/DistrictModel.js";
+import { MultiplayerDistrictManager } from "../../logic/MultiplayerDistrictManager.js";
+import { EventBus } from "../../events/EventBus.js";
+import { PuzzleSubmissionService } from "../../services/PuzzleSubmissionService.js";
 
-/**
- * This class is a Phaser Scene object that creates what the main game mode displays.
- * 
- * It initializes the GridModel, the GridManager, and the DistrictManager. It also creates the
- * event listeners with the EventBus which receive the signals when a cell is clicked, and updates 
- * accordingly.
- */
 export class MultiplayerGrid extends Scene {
     constructor() {
         super("MultiplayerGrid");
@@ -31,15 +24,20 @@ export class MultiplayerGrid extends Scene {
      */
     create(data) {
         this.currentLevelIndex = data.puzzle.index;
-        this.puzzleId = data.id ?? 0
-        this.isInfiniteMode = data.isInfinityMode ?? false
+        this.puzzleId = data.id ?? 0;
+        this.isInfiniteMode = data.isInfinityMode ?? false;
         this.gridModel = new GridModel(data.puzzle);
         this.districtModel = new DistrictModel();
         this.gridManager = new GridManager(this, this.gridModel);
-        this.districtManager = new DistrictManager(this.gridModel, this.districtModel);
+        this.districtManager = new MultiplayerDistrictManager(this.gridModel, this.districtModel);
         this.submissionService = new PuzzleSubmissionService();
         this.activeDistricts = []; // Track all active districts for border management
-        this.level = data.level
+        this.level = data.level;
+
+        this.currentTurn = "blue";
+        this.turnLocked = false;
+
+        this.permLocked = new Set()
 
         EventBus.on("cell:toggled", this.onCellToggled, this);
         EventBus.on("district:formed", this.onDistrictFormed, this);
@@ -47,6 +45,9 @@ export class MultiplayerGrid extends Scene {
         EventBus.on("ui:contiguous", this.onAlertContiguous, this);
 
         this.buildTextUI();
+        this.buildTurnIndicator();
+
+        this.buildLockButton();
         this.buildSubmitButton();
         this.buildHomeButton();
         this.buildLevelsButton();
@@ -55,9 +56,6 @@ export class MultiplayerGrid extends Scene {
         this.events.once("destroy", this.cleanup, this);
     }
 
-    /**
-     * Helper method to initialize Color hex codes that are frequently used, the text size, and the margin size.
-     */
     initConstants() {
         this.white = 0xFFFFFF;
         this.lightBlue = 0x7FBAE7FF;
@@ -69,36 +67,158 @@ export class MultiplayerGrid extends Scene {
     }
 
     /**
-     * This method is called when the user clicks on a cell on the grid. It calls the setCellColor()
-     * method in gridManager to change the color of the cell to red or blue, depending on the color
-     * of the circle. 
-     * 
-     * @param {integer} row the row number of the cell clicked
-     * @param {integer} col the column number of the cell clicked
-     * @param {boolean} active True if the cell is active (already been clicked), False otherwise
-     * @param {boolean} isBlue True if the cell circle is blue, False if it is red
+     * Builds the turn indicator text shown between the title and the grid.
+     * Updated every time switchTurn() is called.
      */
-    onCellToggled({ row, col, active, isBlue }) {
-        let color = this.white;
-        if (active) {
-            if (isBlue) {
-                color = this.lightBlue;
-            } else {
-                color = this.lightRed;
+    buildTurnIndicator() {
+        const topMargin = this.gridManager.offsetY / 2 + 50;
+
+        this.turnText = this.add.text(
+            this.scale.width / 2,
+            topMargin + this.textSize * 2 + 20,
+            this.getTurnLabel(),
+            this.turnTextStyle()
+        ).setOrigin(0.5);
+    }
+
+    getTurnLabel() {
+        return `🔵 BLUE'S TURN — Draw a district`;
+    }
+
+    turnTextStyle() {
+        const isBlue = this.currentTurn === "blue";
+        return {
+            fontSize: this.textSize + 2,
+            fontFamily: "monospace",
+            color: isBlue ? "#0015BC" : "#E9141D",
+            fontStyle: "bold",
+            backgroundColor: isBlue ? "#D6E8FB" : "#FADADD",
+            padding: { x: 12, y: 6 }
+        };
+    }
+
+    validTurn() {
+        if (this.districtManager.selectedCells.length < this.gridModel.districtSize) {
+            alert("Finish your current district before switching!");
+            return false;
+        }
+
+        if (!this.hasNoSolitaryIslands()) {
+            alert("This district would strand cells that can't form a valid region!")
+            return false
+        }
+
+        return true;
+    }
+
+    hasNoSolitaryIslands() {
+        const freeCells = [];
+        const lockedSet = this.districtManager.permanentlySelectedCells
+        const currentSelection = new Set(
+            this.districtManager.selectedCells.map(c => `${c.row},${c.col}`)
+        );
+
+        for (let r = 0; r < this.gridModel.rows; r++) {
+            for (let c = 0; c < this.gridModel.cols; c++) {
+                const key = `${r},${c}`;
+                if (!lockedSet.has(key) && !currentSelection.has(key)) {
+                    freeCells.push({ row: r, col: c });
+                }
             }
         }
 
+        const freeSet = new Set(freeCells.map(c => `${c.row},${c.col}`));
+        const visited = new Set();
+
+        for (const cell of freeCells) {
+            const startKey = `${cell.row},${cell.col}`;
+            if (visited.has(startKey)) continue;
+
+            const component = [];
+            const queue = [cell];
+            visited.add(startKey);
+
+            while (queue.length) {
+                const { row, col } = queue.shift();
+                component.push({ row, col });
+                for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+                    const key = `${row + dr},${col + dc}`;
+                    if (freeSet.has(key) && !visited.has(key)) {
+                        visited.add(key);
+                        queue.push({ row: row + dr, col: col + dc });
+                    }
+                }
+            }
+
+            if (component.length % this.gridModel.districtSize !== 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Switches the active turn and refreshes the indicator label.
+     * Sets turnLocked briefly so rapid clicks don't bleed across turns.
+     */
+    switchTurn() {
+        if (!this.validTurn()) {
+            return
+        }
+
+        this.districtManager.lockSelection()
+
+        this.currentTurn = this.currentTurn === "blue" ? "red" : "blue";
+        const isBlue = this.currentTurn === "blue";
+
+        this.turnText.setText(
+            `${isBlue ? "🔵 BLUE" : "🔴 RED"}'S TURN — Draw a district`
+        );
+        this.turnText.setStyle(this.turnTextStyle());
+
+        this.turnLocked = true;
+        this.time.delayedCall(400, () => { this.turnLocked = false; });
+    }
+
+    buildLockButton() {
+        const buttonY = this.gridManager.offsetY + this.gridModel.rows * this.gridManager.cellSize + 50;
+        const submitButton = this.add.text(
+            this.scale.width / 2,
+            buttonY + 10,
+            "Switch Turn",
+            {
+                fontSize: 30,
+                fontFamily: "monospace",
+                padding: { x: 14, y: 6 },
+                backgroundColor: "#000000",
+                color: "#FFFFFF"
+            }
+        )
+            .setOrigin(0.5)
+            .setInteractive()
+            .on("pointerdown", () => this.switchTurn())
+            .on("pointerover", () => submitButton.setAlpha(0.5))
+            .on("pointerout", () => submitButton.setAlpha(1));
+    }
+
+    /**
+     * Guards cell interaction by current turn.
+     * If turnLocked is true (mid-transition) the click is silently ignored.
+     */
+    onCellToggled({ row, col, active, isBlue }) {
+        if (this.turnLocked) return;
+        if (this.districtManager.selectedCells.length === this.gridModel.districtSize) return;
+
+        let color = this.white;
+        if (active) {
+            color = isBlue ? this.lightBlue : this.lightRed;
+        }
         this.gridManager.setCellColor(row, col, color);
     }
 
     /**
-     * This method is called when a district has been formed. It visually changes the color of the cells
-     * to the winningColor and draws a border around them to help the district stand out.
-     * 
-     * @param {object} district Has two objects cells and winningColor. cells is a list of cells that
-     * are in a District which each have attributes r (the row number), c (the col number), isBlue (True if
-     * cell is blue, false if red), active (true if selected, false otherwise), and locked (true if in a 
-     * district, false otherwise). winningColor is the color that won the district.
+     * When a district is formed, color it, track it, then switch turns.
      */
     onDistrictFormed(district) {
         let color = this.white;
@@ -113,17 +233,10 @@ export class MultiplayerGrid extends Scene {
             this.gridManager.setCellColor(cell.row, cell.col, color);
         }
 
-        // Add district to tracking list and redraw all borders
         this.activeDistricts.push(district);
         this.redrawAllBorders();
     }
 
-    /**
-     * This method is called when a district is cleared. It visually resets the color of the cell
-     * to white using the GridManager and removes the district border.
-     * 
-     * @param {object} cells This is the list of cells in a district that need to be cleared. 
-     */
     onDistrictClear({ cells }) {
         for (const cell of cells) {
             this.gridManager.clearCell(cell.row, cell.col);
@@ -136,7 +249,6 @@ export class MultiplayerGrid extends Scene {
             return !Array.from(cellSet).every(cell => clearCellSet.has(cell));
         });
 
-        // Clear graphics and redraw remaining borders
         this.gridManager.graphics.clear();
         this.redrawAllBorders();
     }
@@ -151,22 +263,15 @@ export class MultiplayerGrid extends Scene {
         alert(message);
     }
 
-    /**
-     * Redraws all active district borders. This method clears the graphics object once and then
-     * draws borders for all active districts to ensure no borders are accidentally cleared.
-     * The graphics object is set to depth 10 to ensure borders render above the grid cells.
-     */
     redrawAllBorders() {
         const g = this.gridManager.graphics;
         g.setDepth(10); // Ensure lines are drawn above the squares
         g.clear();
         g.lineStyle(3, 0x000000, 1);
         g.beginPath();
-
         for (const district of this.activeDistricts) {
             this.drawBorderLines(g, district.cells);
         }
-
         g.strokePath();
     }
 
@@ -217,8 +322,6 @@ export class MultiplayerGrid extends Scene {
      */
     buildTextUI() {
         const numDistricts = (this.gridModel.rows * this.gridModel.cols) / (this.gridModel.districtSize);
-        const colorToWin = this.gridModel.whoWins === "b" ? "blue" : "red";
-
         const topMargin = this.gridManager.offsetY / 2 + 50;
 
         this.add.text(
@@ -226,13 +329,6 @@ export class MultiplayerGrid extends Scene {
             topMargin,
             `Gerrymander ${numDistricts} districts each with ${this.gridModel.districtSize} constituents!`,
             this.textStyle("black")
-        ).setOrigin(0.5);
-
-        this.add.text(
-            this.scale.width / 2,
-            topMargin + this.textSize + 10,
-            `Help ${colorToWin.toUpperCase()} win!`,
-            this.textStyle(colorToWin === "blue" ? "#0015BC" : "#E9141D")
         ).setOrigin(0.5);
     }
 
@@ -328,14 +424,13 @@ export class MultiplayerGrid extends Scene {
             alert(`Please fill all ${this.gridModel.totalDistricts} districts!`);
             return;
         }
-
         try {
             // Format districts for API
             const payload = this.formatDistrictsForAPI();
-            
+
             // Submit puzzle via service
             const metricsResult = await this.submissionService.submitPuzzle(payload);
-            
+
             // Compute winner for display purposes
             const winner = this.districtManager.computeWinner();
             let color = this.white;
@@ -345,24 +440,24 @@ export class MultiplayerGrid extends Scene {
                 color = this.red;
             }
 
-            if (!this.isInfiniteMode){
+            if (!this.isInfiniteMode) {
                 const saved = localStorage.getItem("unlockedLevel");
                 const unlockedLevel = saved ? parseInt(saved) : 0;
-    
+
                 if (this.currentLevelIndex >= unlockedLevel) {
                     localStorage.setItem("unlockedLevel", this.currentLevelIndex + 1);
                 }
             }
 
             // Start Results scene with metrics
-            this.scene.start("Results", { 
-                result: winner, 
+            this.scene.start("Results", {
+                result: winner,
                 color,
                 isInfinityMode: this.isInfiniteMode,
                 metrics: metricsResult,
                 gridModel: this.gridModel,
                 level: this.level
-            });            
+            });
 
         } catch (error) {
             console.error("Error submitting puzzle:", error);
@@ -421,11 +516,9 @@ export class MultiplayerGrid extends Scene {
      */
     cleanup() {
         this.districtManager.destroy();
-
         EventBus.off("cell:toggled", this.onCellToggled, this);
         EventBus.off("district:formed", this.onDistrictFormed, this);
         EventBus.off("district:clear", this.onDistrictClear, this);
         EventBus.off("ui:contiguous", this.onAlertContiguous, this);
-
     }
 }

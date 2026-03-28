@@ -40,7 +40,6 @@ export class Results extends Scene {
         let cols = this.gridModel.cols
         let rows = this.gridModel.rows
         let newLevel = this.level + 1
-        console.log("results id", newLevel)
         if (newLevel % 3 === 0){
             if(cols < rows){
                 cols++

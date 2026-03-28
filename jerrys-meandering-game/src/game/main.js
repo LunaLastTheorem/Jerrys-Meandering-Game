@@ -4,8 +4,8 @@ import { HomePage } from './scenes/HomePage';
 import { Levels } from './scenes/Levels';
 import { Results } from './scenes/Results';
 import { InfinityMode } from './scenes/InfinityMode';
-import { MultiplayerMode } from './scenes/MultiplayerMode';
-import { MultiplayerGrid } from './scenes/MultiplayerGrid';
+import { MultiplayerMode } from './scenes/Multiplayer/MultiplayerMode';
+import { MultiplayerGrid } from './scenes/Multiplayer/MultiplayerGrid';
 
 export default function StartGame(parent) {
     const config = {
