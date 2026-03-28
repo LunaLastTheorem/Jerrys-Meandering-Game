@@ -10,32 +10,17 @@ export class InfinityMode extends Scene {
     }
 
     create() {
-        const data = {
-            "puzzle": {
-                "index": 0,
-                "cols": 3,
-                "rows": 3,
-                "districtSize": 3,
-                "grid": [
-                    [
-                        "r",
-                        "r",
-                        "b"
-                    ],
-                    [
-                        "r",
-                        "r",
-                        "r"
-                    ],
-                    [
-                        "b",
-                        "b",
-                        "b"
-                    ]
-                ]
-            }
-        }
+        const url = `http://127.0.0.1:5000/puzzle/3/3`;
 
-        this.scene.start("Grid", data);
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Puzzle ${levelIndex} not found`);
+                }
+                return response.json();
+            })
+            .then(puzzle => {
+                this.scene.start("Grid", { puzzle, isInfinityMode: true, level: 0 });
+            });
     }
 }

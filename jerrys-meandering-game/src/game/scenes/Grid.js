@@ -31,12 +31,15 @@ export class Grid extends Scene {
      */
     create(data) {
         this.currentLevelIndex = data.puzzle.index;
+        this.puzzleId = data.id ?? 0
+        this.isInfiniteMode = data.isInfinityMode ?? false
         this.gridModel = new GridModel(data.puzzle);
         this.districtModel = new DistrictModel();
         this.gridManager = new GridManager(this, this.gridModel);
         this.districtManager = new DistrictManager(this.gridModel, this.districtModel);
         this.submissionService = new PuzzleSubmissionService();
         this.activeDistricts = []; // Track all active districts for border management
+        this.level = data.level
 
         EventBus.on("cell:toggled", this.onCellToggled, this);
         EventBus.on("district:formed", this.onDistrictFormed, this);
@@ -342,20 +345,24 @@ export class Grid extends Scene {
                 color = this.red;
             }
 
-            const saved = localStorage.getItem("unlockedLevel");
-            const unlockedLevel = saved ? parseInt(saved) : 0;
-
-            if (this.currentLevelIndex >= unlockedLevel) {
-                localStorage.setItem("unlockedLevel", this.currentLevelIndex + 1);
+            if (!this.isInfiniteMode){
+                const saved = localStorage.getItem("unlockedLevel");
+                const unlockedLevel = saved ? parseInt(saved) : 0;
+    
+                if (this.currentLevelIndex >= unlockedLevel) {
+                    localStorage.setItem("unlockedLevel", this.currentLevelIndex + 1);
+                }
             }
 
             // Start Results scene with metrics
             this.scene.start("Results", { 
                 result: winner, 
                 color,
-                infinityModeFlag: false,
-                metrics: metricsResult
-            });
+                isInfinityMode: this.isInfiniteMode,
+                metrics: metricsResult,
+                gridModel: this.gridModel,
+                level: this.level
+            });            
 
         } catch (error) {
             console.error("Error submitting puzzle:", error);
@@ -401,7 +408,7 @@ export class Grid extends Scene {
         }
 
         return {
-            puzzle_id: 0, // TODO: Get actual puzzle ID if needed
+            puzzle_id: this.puzzleId,
             districts: formattedDistricts,
             total_votes_party_a: totalVotesA,
             total_votes_party_b: totalVotesB

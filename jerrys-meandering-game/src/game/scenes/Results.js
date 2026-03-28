@@ -8,10 +8,10 @@ export class Results extends Scene {
     init(data) {
         this.message = data.message;
         this.color = data.color;
-        this.infinityModeFlag = data.infinityModeFlag
+        this.isInfinityMode = data.isInfinityMode
         this.metrics = data.metrics;
-        console.log(this.infinityModeFlag)
-        console.log("Metrics:", this.metrics);
+        this.gridModel = data.gridModel
+        this.level = data.level
     }
 
     preload() {
@@ -28,12 +28,56 @@ export class Results extends Scene {
         this.buildReplayButton(this.scale.width * 0.40, buttonY);
         this.buildHomeButton(this.scale.width * 0.5, buttonY);
 
-        if (!this.infinityModeFlag) {
+        if (!this.isInfinityMode) {
             this.buildLevelsButton(this.scale.width * 0.60, buttonY);
         }
         else {
-            // TODO next Level button
+            this.buildNextPuzzleButton(this.scale.width * 0.60, buttonY)
         }
+    }
+
+    buildNextPuzzleButton(x, y) {
+        let cols = this.gridModel.cols
+        let rows = this.gridModel.rows
+        let newLevel = this.level + 1
+        console.log("results id", newLevel)
+        if (newLevel % 3 === 0){
+            if(cols < rows){
+                cols++
+            }else{
+                rows++
+            }
+        }
+        const nextButton = this.add.text(x, y, "NEXT", {
+            fontSize: 30,
+            fontFamily: "monospace",
+            padding: { x: 14, y: 6 },
+            backgroundColor: "#000000",
+            color: "#FFFFFF"
+        })
+            .setOrigin(0.5)
+            .setInteractive()
+            .on("pointerdown", () => {
+                nextButton.setAlpha(0.5);
+                nextButton.disableInteractive();
+
+                fetch(`http://127.0.0.1:5000/puzzle/${rows}/${cols}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error("Failed to fetch next puzzle");
+                        return res.json();
+                    })
+                    .then(puzzle => {
+                        this.scene.start("Grid", { puzzle, isInfinityMode: true, level: newLevel });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        nextButton.setAlpha(1);
+                        nextButton.setInteractive();
+                        alert("Could not load next puzzle. Please try again.");
+                    });
+            })
+            .on("pointerover", () => nextButton.setAlpha(0.5))
+            .on("pointerout", () => nextButton.setAlpha(1));
     }
 
     buildResultsMessage() {
@@ -83,7 +127,7 @@ export class Results extends Scene {
         if (this.metrics) {
             const eg = this.metrics.efficiency_gap || 0;
             const pp = this.metrics.polsby_popper?.average_ratio || 0;
-            
+
             // Format the text with metric values
             statsText = `Efficiency Gap:\n${eg.toFixed(3)}\n\nCompactness Ratio:\n${pp.toFixed(3)}`;
         } else {

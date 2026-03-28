@@ -21,7 +21,7 @@ export class GridManager {
         this.gridModel = gridModel;
         this.graphics = scene.add.graphics();
 
-        this.gridSize = 300; // TODO: Dont hardcode
+        this.gridSize = 500; // TODO: Dont hardcode
         this.cellSize = Math.min(
             this.gridSize / gridModel.rows,
             this.gridSize / gridModel.cols

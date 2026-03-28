@@ -3,25 +3,26 @@ import math
 import random
 
 def _better_split(w : int, h : int):
-    w = math.ceil( w / 2 ) if (w / 2) % 1 != 0 else (w / 2) + 1
-    h = math.ceil( h / 2 ) if (h / 2) % 1 != 0 else (h / 2) + 1
-    return w * h
+    return (w // 2 + 1) * (h // 2 + 1)
 
 def _get_factors(n):
-    return [i for i in range(2, n + 1) if n % i == 0]
+    factors = []
+    for i in range(2, math.isqrt(n) + 1):
+        if n % i == 0:
+            factors.append(i)
+            if i != n // i:
+                factors.append(n // i)
+    return factors
 
 def _get_config(cells : int):
     minimum_votes = float("inf")
     reg_to_disc = (1,1)
     for factor in _get_factors(cells):
-        w = factor
-        h = int(cells / factor)
-        nm = (w, h)
+        w, h = factor, cells // factor
         curr = int(_better_split(w, h))
         if curr < minimum_votes:
             minimum_votes = curr
-            reg_to_disc = nm
-        print(nm, curr)
+            reg_to_disc = (w, h)
     return (reg_to_disc, minimum_votes)
     
 def generate_puzzle(w, h):
