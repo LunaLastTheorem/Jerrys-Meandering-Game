@@ -6,6 +6,7 @@ import { Results } from './scenes/Results';
 import { InfinityMode } from './scenes/InfinityMode';
 import { MultiplayerMode } from './scenes/Multiplayer/MultiplayerMode';
 import { MultiplayerGrid } from './scenes/Multiplayer/MultiplayerGrid';
+import { Loading } from './scenes/Loading';
 
 export default function StartGame(parent) {
     const config = {
@@ -19,7 +20,7 @@ export default function StartGame(parent) {
         parent,
         backgroundColor: '#ffffff',
         // transparent: true, // this makes the canvas transparent
-        scene: [HomePage, Levels, Grid, Results, InfinityMode, MultiplayerMode, MultiplayerGrid]
+        scene: [HomePage, Levels, Grid, Results, InfinityMode, MultiplayerMode, MultiplayerGrid, Loading]
     };
 
     return new Phaser.Game(config);

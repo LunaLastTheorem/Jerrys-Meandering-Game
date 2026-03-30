@@ -10,13 +10,14 @@ export class HomePage extends Scene {
         this.load.image('background', 'assets/title.png');
         this.load.image('playButton', 'assets/start.png');
         this.load.image('unlimitedButton', 'assets/unlimited.png');
+        this.load.image('multiButton', 'assets/multi.png');
     }
 
     create() {
         let back = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
         back.setScale(2.0);
 
-        const playButton = this.add.image(this.cameras.main.centerX, 750, 'playButton');
+        const playButton = this.add.image(this.cameras.main.centerX, 825, 'playButton');
         playButton.setInteractive();
         playButton.setScale(0.35);
 
@@ -31,7 +32,7 @@ export class HomePage extends Scene {
             this.scene.start("Levels");
         });
 
-        const infinityMode = this.add.image(this.cameras.main.centerX, 875, 'unlimitedButton')
+        const infinityMode = this.add.image(this.cameras.main.centerX - 175, 975, 'unlimitedButton')
         infinityMode.setInteractive()
         infinityMode.setScale(0.35)
 
@@ -46,7 +47,7 @@ export class HomePage extends Scene {
             this.scene.start("InfinityMode")
         })
         
-        const multiplayerMode = this.add.image(this.cameras.main.centerX, 1000, 'unlimitedButton') // Placeholder for multiplayer
+        const multiplayerMode = this.add.image(this.cameras.main.centerX + 175, 975, 'multiButton')
         multiplayerMode.setInteractive()
         multiplayerMode.setScale(0.35)
         
