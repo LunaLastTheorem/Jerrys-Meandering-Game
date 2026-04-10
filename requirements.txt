@@ -3,3 +3,7 @@ python-dotenv
 certifi
 flask
 flask-cors
+gerrychain
+pandas
+matplotlib
+pathlib
