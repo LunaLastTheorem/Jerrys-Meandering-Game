@@ -7,3 +7,4 @@ gerrychain
 pandas
 matplotlib
 pathlib
+tqdm
