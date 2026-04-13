@@ -91,7 +91,7 @@ export class Loading extends Scene {
     loadLevel() {
         const url = `http://127.0.0.1:5000/puzzle/${this.levelIndex}`;
 
-        const MIN_LOAD_TIME = 3000;
+        const MIN_LOAD_TIME = 1500;
         const startTime = Date.now();
 
         let progress = 0;
@@ -121,11 +121,7 @@ export class Loading extends Scene {
                 this.updateProgress(1);
 
                 this.time.delayedCall(remainingTime, () => {
-                    this.cameras.main.fadeOut(300);
-
-                    this.time.delayedCall(300, () => {
-                        this.scene.start("Grid", { puzzle });
-                    });
+                    this.showContinueButton(puzzle);
                 });
             })
             .catch(err => {
@@ -138,5 +134,35 @@ export class Loading extends Scene {
 
         this.progressBar.width = barWidth * value;
         this.percentText.setText(Math.floor(value * 100) + "%");
+    }
+
+    showContinueButton(puzzle) {
+        const { width, height } = this.scale;
+
+        const nextButton = this.add.text(width / 2, height * 0.85, "CONTINUE", {
+            fontSize: "48px",
+            fontFamily: "monospace",
+            color: "#ffffff",
+            backgroundColor: "#000000",
+            padding: { x: 20, y: 10 }
+        })
+        .setOrigin(0.5)
+        .setInteractive();
+
+        nextButton.on("pointerover", () => {
+            nextButton.setAlpha(0.5);
+        });
+
+        nextButton.on("pointerout", () => {
+            nextButton.setAlpha(1.0);
+        });
+
+        nextButton.on("pointerdown", () => {
+            this.cameras.main.fadeOut(300);
+
+            this.time.delayedCall(300, () => {
+                this.scene.start("Grid", { puzzle });
+            });
+        });
     }
 }
