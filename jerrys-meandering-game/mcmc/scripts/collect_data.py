@@ -1,10 +1,9 @@
 import pandas as pd
-from scripts.plot import plot_partition_to_array
 from tqdm import tqdm
 
 def collect_chain_data(chain, burn_in=1000, thin=10, total_steps=None):
-    frames = []
     records = []
+    assignments = []
 
     iterator = tqdm(enumerate(chain), total=total_steps, desc="Running ReCom Chain")
 
@@ -22,11 +21,14 @@ def collect_chain_data(chain, burn_in=1000, thin=10, total_steps=None):
                 "population": partition["population"][district],
                 "perimeter": partition["perimeter"][district],
                 "area": partition["area"][district],
-                "polsby_popper": partition["polsby_popper"][district]
+                "polsby_popper": partition["polsby_popper"][district],
+                "dem_votes": partition["dem_votes"][district],
+                "rep_votes": partition["rep_votes"][district],
+                "other_votes": partition["other_votes"][district]
             })
-        frames.append(plot_partition_to_array(partition))
+        assignments.append(partition.assignment.copy())
 
-        iterator.set_postfix(samples=len(frames))
+        iterator.set_postfix(samples=len(assignments))
     
     df = pd.DataFrame(records)
-    return df, frames
+    return df, assignments

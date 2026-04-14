@@ -1,4 +1,5 @@
 from pathlib import Path
+import pickle
 
 from scripts.data_loader import load_graph
 from scripts.setup import create_initial_partition
@@ -22,14 +23,21 @@ def main():
     chain = build_chain(graph, partition, ideal_population, steps=20000)
 
     # Step 4: Run the chain and collect the data
-    df, frames = collect_chain_data(chain, burn_in=2000, thin=20, total_steps=20000)
+    df, assignments = collect_chain_data(
+        chain, 
+        burn_in=2000, 
+        thin=20, 
+        total_steps=20000
+    )
 
     # Step 5: Save outputs
     output_directory = root_directory / 'outputs'
     output_directory.mkdir(exist_ok=True)
 
-    df.to_csv(output_directory / 'utah_chain_data.csv', index=False)
-    save_gif(frames, output_directory / 'utah.gif')
+    df.to_csv(output_directory / '06_ns_contiguity_pop_pp.csv', index=False)
+
+    with open(output_directory / "06_assignments.pkl", "wb") as f:
+        pickle.dump(assignments, f)
 
 if __name__ == "__main__":
     main()
