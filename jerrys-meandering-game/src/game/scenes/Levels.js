@@ -7,7 +7,6 @@ export class Levels extends Scene {
     }
 
     preload() {
-        this.load.image('bg', 'assets/background.png');
         this.load.spritesheet('map', 'assets/states.png', { frameWidth: 283, frameHeight: 282 });
     }
 
