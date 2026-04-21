@@ -113,7 +113,7 @@ export class Tutorial extends Scene {
         slide.forEach(obj => obj.setVisible(index === 0));
         });
 
-        const nextButton = this.add.text(width / 2, height * .9, "NEXT", {
+        const nextButton = this.add.text(width / 2 + 175, height * .9, "NEXT", {
             fontSize: "48px",
             fontFamily: "monospace",
             color: "#ffffff",
@@ -133,16 +133,60 @@ export class Tutorial extends Scene {
             this.nextSlide();
         });
 
+        const prevButton = this.add.text(width / 2 - 175, height * .9, "PREVIOUS", {
+            fontSize: "48px",
+            fontFamily: "monospace",
+            color: "#ffffff",
+            backgroundColor: "#000000",
+            padding: { x: 20, y: 10 }
+        })
+        .setOrigin(0.5)
+        .setInteractive()
+        .setName('prevButton');
+
+        prevButton.on('pointerover', () => {
+            prevButton.setAlpha(0.5);
+        });
+        prevButton.on('pointerout', () => {
+            prevButton.setAlpha(1.0);
+        });
+        prevButton.on('pointerdown', () => {
+            this.prevSlide();
+        });
+
+        prevButton.setVisible(false);
+
         this.createHomeButton();
 
     }
 
     nextSlide() {
         this.slides[this.currentSlide].forEach(obj => obj.setVisible(false));
-    
+
         this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+
+        this.updatePrevButtonVisibility();
     
         this.slides[this.currentSlide].forEach(obj => obj.setVisible(true));
+    }
+
+    prevSlide() {
+        this.slides[this.currentSlide].forEach(obj => obj.setVisible(false));
+
+        this.currentSlide = (this.currentSlide - 1) % this.slides.length;
+
+        this.updatePrevButtonVisibility();
+
+        this.slides[this.currentSlide].forEach(obj => obj.setVisible(true));
+    }
+
+    updatePrevButtonVisibility() {
+        const prevButton = this.children.getByName('prevButton');
+        if (this.currentSlide === 0) {
+            prevButton.setVisible(false);
+        } else {
+            prevButton.setVisible(true);
+        }
     }
 
     createHomeButton() {
