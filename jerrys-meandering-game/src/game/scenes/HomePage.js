@@ -8,6 +8,7 @@ export class HomePage extends Scene {
 
     preload() {
         this.load.image('background', 'assets/title.png');
+        this.load.image('bg', 'assets/background.png');
         this.load.image('playButton', 'assets/start.png');
         this.load.image('unlimitedButton', 'assets/unlimited.png');
         this.load.image('multiButton', 'assets/multi.png');
@@ -61,6 +62,31 @@ export class HomePage extends Scene {
         multiplayerMode.on('pointerdown', () => {
             this.scene.start("MultiplayerMode")
         })
+
+        const tutorialButton = this.add.graphics()
+        tutorialButton.fillStyle(0x002387, 1);
+        tutorialButton.fillCircle(this.cameras.main.centerX + 195, 825, 30);
+
+        const touchSensor = new Phaser.Geom.Circle(this.cameras.main.centerX + 195, 825, 30);
+        tutorialButton.setInteractive(touchSensor, Phaser.Geom.Circle.Contains);
+
+        const symbol = this.add.text(this.cameras.main.centerX + 195, 825, "?", {
+            fontSize: '40px',
+            color: '#ffffff',
+            fontStyle: "bold"
+        }).setOrigin(0.5);
+
+        tutorialButton.on('pointerover', () => {
+            tutorialButton.setAlpha(0.5);
+            symbol.setAlpha(0.5);
+        });
+        tutorialButton.on('pointerout', () => {
+            tutorialButton.setAlpha(1.0);
+            symbol.setAlpha(1.0);
+        });
+        tutorialButton.on('pointerdown', () => {
+            this.scene.start("Tutorial");
+        });
 
         EventBus.emit('current-scene-ready', this);
     }
