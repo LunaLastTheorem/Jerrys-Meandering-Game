@@ -402,6 +402,7 @@ export class Grid extends Scene {
             grid: grid, // 2D array of cell colors
             rows: this.gridModel.rows,
             cols: this.gridModel.cols,
+            winner: this.gridModel.whoWins,
             districts: formattedDistricts
         };
     }

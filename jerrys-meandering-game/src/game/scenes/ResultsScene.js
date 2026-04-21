@@ -82,35 +82,46 @@ export class ResultsScene extends Scene {
             img.style.objectFit = 'contain';
 
             const updateHistogramLayout = () => {
-                const w = this.scale.width;
-                const h = this.scale.height;
 
-                img.style.width = Math.min(w * 0.7, 700) + "px";
+                // Get the size and position of the Phaser canvas in the browser
+                const canvasBounds = this.game.canvas.getBoundingClientRect();
+                const gameW = this.scale.width;
+                const gameH = this.scale.height;
+
+                // Calculate the scale ratio between the "logical" game size and "actual" canvas size
+                const multiplier = canvasBounds.width / gameW;
+
+                // Set the image width based on a percentage of the CURRENT canvas width
+                const targetWidth = Math.min(gameW * 0.5, 1000); // Relative to game logic
+                img.style.width = (targetWidth * multiplier) + "px";
                 img.style.height = "auto";
 
-                img.style.left = (w * 0.08) + "px";
-                img.style.top = (h * 0.15) + "px";
+                // Position it relative to the canvas's top-left corner
+                const relativeX = gameW * 0.08;
+                const relativeY = gameH * 0.22;
+
+                img.style.left = (canvasBounds.left + (relativeX * multiplier)) + "px";
+                img.style.top = (canvasBounds.top + (relativeY * multiplier)) + "px";
             };
 
-            updateHistogramLayout();
-    
-            // Add to page
             document.getElementById('game-container').appendChild(img);
-            
-            // Store reference for cleanup
             this.histogramImg = img;
 
+            img.onload = updateHistogramLayout;
+
             this.scale.on("resize", updateHistogramLayout);
+            window.addEventListener('scroll', updateHistogramLayout);
 
-            this.events.once("shutdown", () => {
+            const cleanup = () => {
                 this.scale.off("resize", updateHistogramLayout);
-                img.remove();
-            });
+                window.removeEventListener('scroll', updateHistogramLayout);
+                if (img.parentNode) {
+                    img.remove();
+                }
+            };
 
-            this.events.once("destroy", () => {
-                this.scale.off("resize", updateHistogramLayout);
-                img.remove();
-            });
+            this.events.once("shutdown", cleanup);
+            this.events.once("destroy", cleanup);
             
         } catch (error) {
             console.error("Error displaying histogram:", error);
@@ -119,11 +130,11 @@ export class ResultsScene extends Scene {
 
     buildSummaryStats() {
         const stats = this.evaluationData;
-        const cardWidth = this.scale.width * 0.25;
-        const cardHeight = this.scale.height * 0.5;
+        const cardWidth = this.scale.width * 0.3;
+        const cardHeight = this.scale.height * 0.6;
 
-        const x = this.scale.width * 0.65;
-        const y = this.scale.height * 0.25;
+        const x = this.scale.width * 0.6;
+        const y = this.scale.height * 0.2;
 
         // Stats card background
         const graphics = this.add.graphics();
@@ -136,7 +147,7 @@ export class ResultsScene extends Scene {
         this.add.text(
             x + cardWidth / 2,
             y + 40,
-            "SUMMARY",
+            "SIMULATION SUMMARY",
             {
                 fontSize: 50,
                 fontFamily: "monospace",
@@ -147,29 +158,34 @@ export class ResultsScene extends Scene {
 
         // Stats text
         const statsText = [
-            `Your Map: ${stats.submitted_seats} seats`,
-            `Median: ${stats.medians} seats`,
-            `Mean: ${stats.mean.toFixed(1)} seats`,
-            `Range: ${stats.min}-${stats.max} seats`,
+            `Total Districts on Map: ${stats.num_districts} Districts`,
+            `Total Generated Maps: ${stats.total_samples} samples`,
+            ``,
+            `Your Map: ${stats.submitted_seats} Districts`,
+            `Median: ${stats.medians} Districts`,
+            `Mean: ${stats.mean.toFixed(1)} Districts`,
+            `Range: ${stats.min}-${stats.max} Districts`,
             ``,
             `Democrats favored: ${Math.round(stats.dem_favorable_pct)}%`,
             `Republicans favored: ${Math.round(stats.rep_favorable_pct)}%`,
             `Tied: ${Math.round(stats.tied_pct)}%`,
             ``,
-            `Samples: ${stats.total_samples}`,
-            `Vote Share: ${Math.round((stats.submitted_vote_share * 100))}%`
+            stats.fairness_statement
         ].join('\n');
 
         this.add.text(
             x + cardWidth / 2,
-            y + 90,
+            y + 95,
             statsText,
             {
                 fontSize: 24,
                 fontFamily: "monospace",
                 color: "#000000",
                 align: "center",
-                lineSpacing: 9
+                lineSpacing: 9,
+                wordWrap: {
+                    width: cardWidth - 20
+                }
             }
         ).setOrigin(0.5, 0);
     }

@@ -7,6 +7,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
+import statistics
 
 def determine_steps(grid_rows, grid_cols):
     """
@@ -89,103 +90,148 @@ def run_mcmc_simulation(partition, num_districts, grid_rows, grid_cols):
         total_steps=total_steps
     )
 
-    # Collect data from chain
-    dem_seats_list = []
-    dem_vote_share_list = []
-
     # Calculate initial (submitted) map metrics
-    submitted_dem_seats = sum(
-        1 for d in partition.parts if partition['dem_votes'][d] > partition['rep_votes'][d]
-    )
-    submitted_dem_votes = sum(partition['dem_votes'].values())
-    submitted_total_votes = sum(partition['population'].values())
-    submitted_dem_votes_share = submitted_dem_votes / submitted_total_votes if submitted_total_votes > 0 else 0
+    submitted_dem_seats = 0
+    submitted_rep_seats = 0
+    submitted_tie_seats = 0
+
+    for d in partition.parts:
+        dem = partition['dem_votes'][d]
+        rep = partition['rep_votes'][d]
+
+        if dem > rep:
+            submitted_dem_seats += 1
+        elif rep > dem:
+            submitted_rep_seats += 1
+        else:
+            submitted_tie_seats += 1
 
     # Run chain and collect samples
+    dem_seats_list = []
+    rep_seats_list = []
+    tie_seats_list = []
+
     for step, current_partition in enumerate(chain):
         if step % thin != 0:
             continue
 
-        # Count Democratic seats
-        dem_seats = sum(
-            1 for d in current_partition.parts if current_partition['dem_votes'][d] > current_partition['rep_votes'][d]
-        )
-        dem_seats_list.append(dem_seats)
+        # Count Democratic, Republican and Tie seats
+        dem_seats = 0
+        rep_seats = 0
+        tie_seats = 0
 
-        # Calculate Democratic vote share
-        dem_votes = sum(current_partition['dem_votes'].values())
-        total_votes = sum(current_partition['population'].values())
-        dem_vote_share = dem_votes / total_votes if total_votes > 0 else 0
-        dem_vote_share_list.append(dem_vote_share)
+        for d in current_partition.parts:
+            dem = current_partition['dem_votes'][d]
+            rep = current_partition['rep_votes'][d]
+
+            if dem > rep:
+                dem_seats += 1
+            elif rep > dem:
+                rep_seats += 1
+            else:
+                tie_seats += 1
+        dem_seats_list.append(dem_seats)
+        rep_seats_list.append(rep_seats)
+        tie_seats_list.append(tie_seats)
+
     
     return {
         'dem_seats': dem_seats_list,
-        'dem_vote_share': dem_vote_share_list,
+        'rep_seats': rep_seats_list,
+        'tie_seats': tie_seats_list,
         'submitted_dem_seats': submitted_dem_seats,
-        'submitted_dem_vote_share': submitted_dem_votes_share,
-        'num_samples': len(dem_seats_list)
+        'submitted_rep_seats': submitted_rep_seats,
+        'submitted_tie_seats': submitted_tie_seats,
+        'num_samples': len(dem_seats_list),
+        'num_districts': num_districts
     }
 
-def compute_histogram_data(results):
+def compute_fairness_statement(seats, submitted_seats):
+    total = len(seats)
+    if total == 0:
+        return 0, "unknown"
+
+    worse = sum(1 for s in seats if s < submitted_seats)
+    pct = 100 * worse / total
+
+    if pct < 60:
+        strength = "weak"
+    elif pct < 80:
+        strength = "moderate"
+    else:
+        strength = "strong"
+
+    return pct, strength
+
+def compute_results_data(results, party):
     """
-    Compute histogram statistics for Democratic seat share.
+    Compute histogram statistics for seat outcome.
 
     Args:
         results: Dictionary returned by run_mcmc_simulation()
+        party: string 'rep' or 'dem' based on party to win
     
     Returns:
         dict with histogram data for frontend rendering
     """
-
     dem_seats = results['dem_seats']
-    submitted_seats = results['submitted_dem_seats']
+    rep_seats = results['rep_seats']
 
-    # Compute histogram bins
-    min_seats = min(dem_seats) if dem_seats else 0
-    max_seats = max(dem_seats) if dem_seats else 0
+    seats = results[f'{party}_seats']
+    submitted_seats = results[f'submitted_{party}_seats']
 
-    # Create bins (one bin per seat count)
-    bins = range(min_seats, max_seats + 2) # +2 to include max_seats in bins
-
-    # Count occurrences
-    histogram = {}
-    for i in range(min_seats, max_seats + 1):
-        histogram[i] = dem_seats.count(i)
-
-        # Calculate statistics
-        if dem_seats:
-            median_seats = sorted(dem_seats)[len(dem_seats) // 2]
-            mean_seats = sum(dem_seats) / len(dem_seats)
-            min_sample = min(dem_seats)
-            max_sample = max(dem_seats)
-        else:
-            median_seats = submitted_seats
-            mean_seats = submitted_seats
-            min_sample = submitted_seats
-            max_sample = submitted_seats
-        
-        # Count how many simulated outcomes are more favorable to each party
-        dem_favorable = sum(1 for s in dem_seats if s > submitted_seats)
-        rep_favorable = sum(1 for s in dem_seats if s < submitted_seats)
-        tied = sum(1 for s in dem_seats if s == submitted_seats)
-
-        return {
-            'histogram': histogram,
-            'bins': list(bins),
-            'submitted_seats': submitted_seats,
-            'medians': median_seats,
-            'mean': mean_seats,
-            'min': min_sample,
-            'max': max_sample,
-            'dem_favorable_pct': (dem_favorable / len(dem_seats)) * 100 if dem_seats else 0,
-            'rep_favorable_pct': (rep_favorable / len(dem_seats)) * 100 if dem_seats else 0,
-            'tied_pct': (tied / len(dem_seats)) * 100 if dem_seats else 0,
-            'total_samples': len(dem_seats),
-            'submitted_vote_share': results['submitted_dem_vote_share'],
-            'mean_vote_share': sum(results['dem_vote_share']) / len(results['dem_vote_share']) if results['dem_vote_share'] else 0,
-        }
+    # Calculate statistics
+    if seats:
+        median_seats = statistics.median(seats)
+        mean_seats = sum(seats) / len(seats)
+        min_sample = min(seats)
+        max_sample = max(seats)
+    else:
+        median_seats = submitted_seats
+        mean_seats = submitted_seats
+        min_sample = submitted_seats
+        max_sample = submitted_seats
     
-def generate_histogram_png(results):
+    # Party favorable by each generated map
+    dem_favorable = 0
+    rep_favorable = 0
+    tied = 0
+
+    for d, r in zip(dem_seats, rep_seats):
+        if d > r:
+            dem_favorable += 1
+        elif r > d:
+            rep_favorable += 1
+        else:
+            tied += 1
+    
+    total = len(seats)
+
+    # Fairness assessment
+    pct, strength = compute_fairness_statement(seats, submitted_seats)
+
+    if party == "dem":
+        direction = "Democrat-leaning"
+    else:
+        direction = "Republican-leaning"
+
+    fairness_statement = f"Your map is more {direction} than {pct:.0f}% of generated maps, indicating a {strength} gerrymander."
+
+    return {
+        'submitted_seats': submitted_seats,
+        'medians': median_seats,
+        'mean': mean_seats,
+        'min': min_sample,
+        'max': max_sample,
+        'dem_favorable_pct': (dem_favorable / total) * 100 if seats else 0,
+        'rep_favorable_pct': (rep_favorable / total) * 100 if seats else 0,
+        'tied_pct': (tied / total) * 100 if seats else 0,
+        'total_samples': total,
+        'num_districts': results['num_districts'],
+        'fairness_statement': fairness_statement
+    }
+    
+def generate_histogram_png(results, party, color):
     """
     Generate histogram PNG image showing Democratic seat distribution.
 
@@ -196,10 +242,10 @@ def generate_histogram_png(results):
         Base64-encoded PNG image string
     """
 
-    dem_seats = results["dem_seats"]
-    submitted_seats = results["submitted_dem_seats"]
+    seats = results[f"{party}_seats"]
+    submitted_seats = results[f"submitted_{party}_seats"]
 
-    if not dem_seats:
+    if not seats:
         raise ValueError("No samples collected from MCMC simulation")
 
     try:
@@ -210,22 +256,22 @@ def generate_histogram_png(results):
             spine.set_visible(False)
     
         # Integer-centered bins
-        min_seats = int(min(dem_seats))
-        max_seats = int(max(dem_seats))
+        min_seats = int(min(seats))
+        max_seats = int(max(seats))
 
         bins = range(min_seats, max_seats + 2)
 
         # Histogram
         counts, bin_edges, patches = ax.hist(
-            dem_seats,
+            seats,
             bins=bins,
             align='left',
-            color="#2980b9",
+            color=color,
             edgecolor="white",
             rwidth=0.8
         )
 
-        total_samples = len(dem_seats)
+        total_samples = len(seats)
 
         for count, patch in zip(counts, patches):
             if count > 0:
@@ -248,19 +294,42 @@ def generate_histogram_png(results):
 
         ax.axvline(
             submitted_seats,
-            color="#e94634",
+            color="#000000",
             linestyle="--",
             linewidth=2,
             label=f"Your Map ({submitted_seats}) seats"
         )
 
-        ax.set_xlabel("Democratic Seats")
-        ax.set_ylabel("Frequency")
-        ax.set_title("Probability Distribution of Democratic Seats")
+        if party == 'dem':
+            xlabel = "Number of Democratic Districts"
+            title = "Distribution of Total Democratic Districts Across Simulated Maps"
+            caption = "Histogram of how many Democratic districts were generated for each alternative map in MCMC simulation. Black line represents how many Democratic districts you created."
+        else:
+            xlabel = "Number of Republican Districts"
+            title = "Distribution of Total Republican Districts Across Simulated Maps"
+            caption = "Histogram of how many Republican districts were generated for each alternative map in MCMC simulation. Black line represents how many Republican districts you created."
+        
+        ax.set_title(
+            title,
+            fontsize=16,
+            pad=12
+        )
+
+        ax.set_xlabel(
+            xlabel,
+            fontsize=13,
+            labelpad=8
+        )
+        ax.set_ylabel(
+            "Frequency (MCMC samples)",
+            fontsize=13,
+            labelpad=8
+        )
 
         ax.set_xticks(range(min_seats, max_seats + 1))
-        ax.set_xlim(min_seats - 0.5, max_seats + 0.5)
+        ax.tick_params(axis='both', labelsize=11)
 
+        ax.set_xlim(min_seats - 0.5, max_seats + 0.5)
         ax.set_ylim(0, max(counts) * 1.2)
 
         ax.grid(axis="y", alpha=0.3)
@@ -268,9 +337,17 @@ def generate_histogram_png(results):
         ax.legend()
 
         fig.tight_layout()
+        fig.subplots_adjust(top=0.88, bottom=0.2, left=0.12, right=0.98)
+        fig.text(
+            0.5, 0.03,
+            caption,
+            ha='center',
+            fontsize=10,
+            wrap=True
+        )
 
         buffer = BytesIO()
-        fig.savefig(buffer, format="png", dpi=90, bbox_inches="tight")
+        fig.savefig(buffer, format="png", dpi=120, bbox_inches="tight")
         buffer.seek(0)
 
         image_base64 = base64.b64encode(buffer.read()).decode("utf-8")

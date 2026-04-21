@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from metrics import compute_metrics
 from map_to_gerrychain import grid_to_graph, validate_submitted_districts, create_initial_partition
-from adaptive_simulation import run_mcmc_simulation, compute_histogram_data, generate_histogram_png
+from adaptive_simulation import run_mcmc_simulation, compute_results_data, generate_histogram_png
 from map_generator import generate_puzzle, generate_multiplayer_puzzle
 
 app = Flask(__name__, static_url_path="", static_folder='../dist', template_folder='../dist')
@@ -111,6 +111,7 @@ def evaluate_map():
         "grid": [[row, col color], ...] // 2D array of cell colors
         "rows": int, // Grid height
         "cols": int, // Grid width
+        "winner": str, // Assigned to win party
         "districts": [ // List of districts
             {
                 "id": int,
@@ -124,13 +125,14 @@ def evaluate_map():
         data = request.get_json()
 
         # Validate input
-        required_fields = ['grid', 'rows', 'cols', 'districts']
+        required_fields = ['grid', 'rows', 'cols', 'winner', 'districts']
         if not all(field in data for field in required_fields):
             return jsonify({"error": "Missing required fields"}), 400
         
         grid_map = data.get('grid')
         rows = data.get('rows')
         cols = data.get('cols')
+        winner = data.get('winner')
         districts_data = data.get('districts')
 
         # Extract district cells
@@ -146,12 +148,19 @@ def evaluate_map():
         graph = grid_to_graph(grid_map, districts)
         partition = create_initial_partition(graph)
 
+        if winner == 'b':
+            party = 'dem'
+            color = '#2980b9'
+        else:
+            party = 'rep'
+            color = '#e94634'
+
         # Run MCMC simulation
         results = run_mcmc_simulation(partition, num_districts, rows, cols)
 
         # Compute histogram data and generate PNG
-        histogram_data = compute_histogram_data(results)
-        histogram_png = generate_histogram_png(results)
+        histogram_data = compute_results_data(results, party)
+        histogram_png = generate_histogram_png(results, party, color)
 
         histogram_data['histogram_image'] = histogram_png
 
