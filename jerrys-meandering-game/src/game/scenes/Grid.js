@@ -349,7 +349,7 @@ export class Grid extends Scene {
             }
 
             // Start Results scene with evaluation data
-            this.scene.start("ResultsScene", { 
+            this.scene.start("SinglePlayerResults", { 
                 evaluationData: evaluationData,
                 gridModel: this.gridModel,
                 level: this.level,

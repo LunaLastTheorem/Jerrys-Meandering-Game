@@ -425,38 +425,22 @@ export class MultiplayerGrid extends Scene {
             return;
         }
         try {
-            // Format districts for API
-            const payload = this.formatDistrictsForAPI();
-
-            // Submit puzzle via service
-            const metricsResult = await this.submissionService.submitPuzzle(payload);
-
             // Compute winner for display purposes
             const winner = this.districtManager.computeWinner();
             let color = this.white;
+            let message = "It's a Tie!";
             if (winner === "blue") {
+                message = "Blue Wins!";
                 color = this.blue;
             } else if (winner === "red") {
+                message = "Red Wins!";
                 color = this.red;
             }
 
-            if (!this.isInfiniteMode) {
-                const saved = localStorage.getItem("unlockedLevel");
-                const unlockedLevel = saved ? parseInt(saved) : 0;
-
-                if (this.currentLevelIndex >= unlockedLevel) {
-                    localStorage.setItem("unlockedLevel", this.currentLevelIndex + 1);
-                }
-            }
-
             // Start Results scene with metrics
-            this.scene.start("Results", {
-                result: winner,
-                color,
-                isInfinityMode: this.isInfiniteMode,
-                metrics: metricsResult,
-                gridModel: this.gridModel,
-                level: this.level
+            this.scene.start("MultiplayerResults", {
+                message: message,
+                color: color,
             });
 
         } catch (error) {

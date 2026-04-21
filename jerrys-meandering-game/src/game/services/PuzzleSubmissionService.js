@@ -12,36 +12,6 @@ export class PuzzleSubmissionService {
     }
 
     /**
-     * Submits puzzle data to the backend and returns computed metrics.
-     * 
-     * @param {object} payload The formatted district data with the following structure:
-     *                         {
-     *                             puzzle_id: number,
-     *                             districts: array,
-     *                             total_votes_party_a: number,
-     *                             total_votes_party_b: number
-     *                         }
-     * 
-     * @returns {Promise<object>} The metrics result from the API containing efficiency_gap and polsby_popper
-     * @throws {Error} If the API request fails
-     */
-    async submitPuzzle(payload) {
-        const response = await fetch(`${this.apiUrl}/submit-puzzle`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            throw new Error(`API error: ${response.statusText}`);
-        }
-
-        return await response.json();
-    }
-
-    /**
      * Evaluates a map for gerrymandering using MCMC simulation.
      * 
      * @param {object} payload The formatted map data with the following structure:

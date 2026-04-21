@@ -1,8 +1,8 @@
 import { Scene } from "phaser";
 
-export class ResultsScene extends Scene {
+export class SinglePlayerResults extends Scene {
     constructor() {
-        super("ResultsScene");
+        super("SinglePlayerResults");
     }
 
     init(data) {
