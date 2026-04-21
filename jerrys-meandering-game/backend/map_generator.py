@@ -31,7 +31,7 @@ def generate_puzzle(rows, cols):
     who_wins = random.choice(["r", "b"])
     
     data = {
-        "index" : 9999,
+        "index" : -1,
         "rows" : rows,
         "cols" : cols,
         "districtSize": config[0][1],
