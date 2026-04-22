@@ -211,9 +211,9 @@ def compute_results_data(results, party):
     pct, strength = compute_fairness_statement(seats, submitted_seats)
 
     if party == "dem":
-        direction = "Democrat-leaning"
+        direction = "Blue-leaning"
     else:
-        direction = "Republican-leaning"
+        direction = "Red-leaning"
 
     fairness_statement = f"Your map is more {direction} than {pct:.0f}% of generated maps, indicating a {strength} gerrymander."
 
@@ -301,13 +301,13 @@ def generate_histogram_png(results, party, color):
         )
 
         if party == 'dem':
-            xlabel = "Number of Democratic Districts"
-            title = "Distribution of Total Democratic Districts Across Simulated Maps"
-            caption = "Histogram of how many Democratic districts were generated for each alternative map in MCMC simulation. Black line represents how many Democratic districts you created."
+            xlabel = "Number of Blue Districts"
+            title = "Distribution of Total Blue Districts Across Simulated Maps"
+            caption = "Histogram of how many Blue districts were generated for each alternative map in MCMC simulation. Black line represents how many Blue districts you created."
         else:
-            xlabel = "Number of Republican Districts"
-            title = "Distribution of Total Republican Districts Across Simulated Maps"
-            caption = "Histogram of how many Republican districts were generated for each alternative map in MCMC simulation. Black line represents how many Republican districts you created."
+            xlabel = "Number of Red Districts"
+            title = "Distribution of Total Red Districts Across Simulated Maps"
+            caption = "Histogram of how many Red districts were generated for each alternative map in MCMC simulation. Black line represents how many Red districts you created."
         
         ax.set_title(
             title,

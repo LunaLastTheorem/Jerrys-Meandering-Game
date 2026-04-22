@@ -166,8 +166,8 @@ export class SinglePlayerResults extends Scene {
             `Mean: ${stats.mean.toFixed(1)} Districts`,
             `Range: ${stats.min}-${stats.max} Districts`,
             ``,
-            `Democrats favored: ${Math.round(stats.dem_favorable_pct)}%`,
-            `Republicans favored: ${Math.round(stats.rep_favorable_pct)}%`,
+            `Blue Voters favored: ${Math.round(stats.dem_favorable_pct)}%`,
+            `Red Voters favored: ${Math.round(stats.rep_favorable_pct)}%`,
             `Tied: ${Math.round(stats.tied_pct)}%`,
             ``,
             stats.fairness_statement
