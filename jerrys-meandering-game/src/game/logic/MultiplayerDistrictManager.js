@@ -7,7 +7,7 @@ import { EventBus } from "../events/EventBus.js";
  * It also emits different signals back to the Grid Scene when certain conditions on the board are met.
  */
 export class MultiplayerDistrictManager {
-    
+
     /**
      * The constructor initializes fields for this class and handles the cell:clicked signal
      * 
@@ -35,9 +35,9 @@ export class MultiplayerDistrictManager {
      * @param {integer} row the row index of the cell clicked
      * @param {integer} col the column index of the cell clicked
      */
-    handleClickCell({row, col}) {        
+    handleClickCell({ row, col }) {
         const cell = this.gridModel.getCell(row, col);
-        if(this.permanentlySelectedCells.has(`${row},${col}`)) return
+        if (this.permanentlySelectedCells.has(`${row},${col}`)) return
 
         if (cell.locked) {
             const districts = this.districtModel.getDistricts();
@@ -54,7 +54,7 @@ export class MultiplayerDistrictManager {
             return;
         }
 
-        if (this.selectedCells.length >= this.districtSize){
+        if (this.selectedCells.length >= this.districtSize) {
             return
         }
 
@@ -78,9 +78,9 @@ export class MultiplayerDistrictManager {
             this.formDistrict(this.selectedCells);
         }
     }
-    
-    lockSelection(){
-        for(const cell of this.selectedCells){
+
+    lockSelection() {
+        for (const cell of this.selectedCells) {
             this.permanentlySelectedCells.add(`${cell.row},${cell.col}`)
         }
 
@@ -137,6 +137,17 @@ export class MultiplayerDistrictManager {
         this.districtModel.addDistrict(district);
 
         EventBus.emit("district:formed", district);
+    }
+
+    formDistrictFromCoordinates(regions) {
+        let cells = []
+        for (const coord of regions) {
+            let row = coord[0]
+            let col = coord[1]
+            let cell = this.gridModel.cells[row][col]
+            cells.push(cell)
+        }
+        this.formDistrict(cells)
     }
 
     /**

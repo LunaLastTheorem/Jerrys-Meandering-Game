@@ -65,12 +65,27 @@ export class MultiplayerMode extends Scene {
         )
             .setOrigin(0.5)
             .setInteractive()
-            .on("pointerdown", () => this.startMultiplayerMode())
+            .on("pointerdown", () => this.startAIMultiplayerMode())
             .on("pointerover", () => AIButton.setAlpha(0.5))
             .on("pointerout", () => AIButton.setAlpha(1));
     }
 
     startMultiplayerMode() {
+        const url = `http://127.0.0.1:5000/puzzle/multiplayer/10/10`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Puzzle ${levelIndex} not found`);
+                }
+                return response.json();
+            })
+            .then(puzzle => {
+                this.scene.start("MultiplayerGrid", { puzzle });
+            });
+    }
+
+    startAIMultiplayerMode() {
         const url = `http://127.0.0.1:5000/puzzle/multiplayer/10/10`;
 
         fetch(url)

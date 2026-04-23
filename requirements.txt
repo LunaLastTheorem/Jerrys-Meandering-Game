@@ -8,3 +8,6 @@ pandas
 matplotlib
 pathlib
 tqdm
+gerrychain
+networkx
+geopandas
