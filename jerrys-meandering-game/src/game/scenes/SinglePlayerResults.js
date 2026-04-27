@@ -176,7 +176,7 @@ export class SinglePlayerResults extends Scene {
             y + 95,
             statsText,
             {
-                fontSize: 28,
+                fontSize: 30,
                 fontFamily: "grotesk",
                 color: "#000000",
                 align: "center",
