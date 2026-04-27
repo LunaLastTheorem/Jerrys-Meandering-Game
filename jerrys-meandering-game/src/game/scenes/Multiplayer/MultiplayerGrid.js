@@ -62,7 +62,7 @@ export class MultiplayerGrid extends Scene {
         this.lightRed = 0xFFA3A6;
         this.red = 0xE9141D;
         this.blue = 0x0015BC;
-        this.textSize = 20;
+        this.textSize = 40;
         this.margin = 20;
     }
 
@@ -71,11 +71,11 @@ export class MultiplayerGrid extends Scene {
      * Updated every time switchTurn() is called.
      */
     buildTurnIndicator() {
-        const topMargin = this.gridManager.offsetY / 2 + 50;
+        const topMargin = this.gridManager.offsetY / 2 + 25;
 
         this.turnText = this.add.text(
             this.scale.width / 2,
-            topMargin + this.textSize * 2 + 20,
+            topMargin + this.textSize * 2 + 5,
             this.getTurnLabel(),
             this.turnTextStyle()
         ).setOrigin(0.5);
@@ -89,9 +89,8 @@ export class MultiplayerGrid extends Scene {
         const isBlue = this.currentTurn === "blue";
         return {
             fontSize: this.textSize + 2,
-            fontFamily: "monospace",
+            fontFamily: "grotesk-bold",
             color: isBlue ? "#0015BC" : "#E9141D",
-            fontStyle: "bold",
             backgroundColor: isBlue ? "#D6E8FB" : "#FADADD",
             padding: { x: 12, y: 6 }
         };
@@ -188,8 +187,8 @@ export class MultiplayerGrid extends Scene {
             buttonY + 10,
             "Switch Turn",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -322,7 +321,7 @@ export class MultiplayerGrid extends Scene {
      */
     buildTextUI() {
         const numDistricts = (this.gridModel.rows * this.gridModel.cols) / (this.gridModel.districtSize);
-        const topMargin = this.gridManager.offsetY / 2 + 50;
+        const topMargin = this.gridManager.offsetY / 2 + 55;
 
         this.add.text(
             this.scale.width / 2,
@@ -339,11 +338,11 @@ export class MultiplayerGrid extends Scene {
         const buttonY = this.gridManager.offsetY + this.gridModel.rows * this.gridManager.cellSize + 50;
         this.submitButton = this.add.text(
             this.scale.width / 2,
-            buttonY + 50,
+            buttonY + 75,
             "SUBMIT",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -362,11 +361,11 @@ export class MultiplayerGrid extends Scene {
     buildHomeButton() {
         const homeButton = this.add.text(
             this.scale.width * 0.45,
-            this.scale.height * 0.1 + 50,
+            this.scale.height * 0.1 + 40,
             "HOME",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -385,11 +384,11 @@ export class MultiplayerGrid extends Scene {
     buildLevelsButton() {
         const levelsButton = this.add.text(
             this.scale.width * 0.55,
-            this.scale.height * 0.1 + 50,
+            this.scale.height * 0.1 + 40,
             "LEVELS",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -405,9 +404,8 @@ export class MultiplayerGrid extends Scene {
     textStyle(color) {
         return {
             fontSize: this.textSize,
-            fontFamily: "monospace",
-            color,
-            fontStyle: "bold"
+            fontFamily: "grotesk-bold",
+            color
         };
     }
 

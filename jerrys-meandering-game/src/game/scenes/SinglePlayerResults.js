@@ -27,9 +27,8 @@ export class SinglePlayerResults extends Scene {
             "GERRYMANDERING ANALYSIS",
             {
                 fontSize: 65,
-                fontFamily: "monospace",
-                color: "#000000",
-                fontStyle: "bold"
+                fontFamily: "grotesk-bold",
+                color: "#000000"
             }
         ).setOrigin(0.5);
 
@@ -150,9 +149,8 @@ export class SinglePlayerResults extends Scene {
             "SIMULATION SUMMARY",
             {
                 fontSize: 50,
-                fontFamily: "monospace",
-                color: "#000000",
-                fontStyle: "bold"
+                fontFamily: "grotesk-bold",
+                color: "#000000"
             }
         ).setOrigin(0.5);
 
@@ -178,8 +176,8 @@ export class SinglePlayerResults extends Scene {
             y + 95,
             statsText,
             {
-                fontSize: 24,
-                fontFamily: "monospace",
+                fontSize: 28,
+                fontFamily: "grotesk",
                 color: "#000000",
                 align: "center",
                 lineSpacing: 9,
@@ -202,8 +200,8 @@ export class SinglePlayerResults extends Scene {
             }
         }
         const nextButton = this.add.text(x, y, "NEXT", {
-            fontSize: 24,
-            fontFamily: "monospace",
+            fontSize: 34,
+            fontFamily: "grotesk-bold",
             padding: { x: 12, y: 6 },
             backgroundColor: "#000000",
             color: "#FFFFFF"
@@ -240,8 +238,8 @@ export class SinglePlayerResults extends Scene {
             y,
             "HOME",
             {
-                fontSize: 24,
-                fontFamily: "monospace",
+                fontSize: 34,
+                fontFamily: "grotesk-bold",
                 padding: { x: 12, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -260,8 +258,8 @@ export class SinglePlayerResults extends Scene {
             y,
             "LEVELS",
             {
-                fontSize: 24,
-                fontFamily: "monospace",
+                fontSize: 34,
+                fontFamily: "grotesk-bold",
                 padding: { x: 12, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -281,8 +279,8 @@ export class SinglePlayerResults extends Scene {
             y,
             "REPLAY",
             {
-                fontSize: 24,
-                fontFamily: "monospace",
+                fontSize: 34,
+                fontFamily: "grotesk-bold",
                 padding: { x: 12, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"

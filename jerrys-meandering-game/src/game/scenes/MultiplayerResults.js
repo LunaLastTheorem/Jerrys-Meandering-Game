@@ -32,9 +32,8 @@ export class MultiplayerResults extends Scene {
             "BATTLE ANALYSIS",
             {
                 fontSize: 65,
-                fontFamily: "monospace",
-                color: "#000000",
-                fontStyle: "bold"
+                fontFamily: "grotesk-bold",
+                color: "#000000"
             }
         ).setOrigin(0.5);
 
@@ -80,9 +79,8 @@ export class MultiplayerResults extends Scene {
             this.message,
             {
                 fontSize: 70,
-                fontFamily: "monospace",
+                fontFamily: "grotesk-bold",
                 color: "#FFFFFF",
-                fontStyle: "bold",
                 stroke: "#000000",
                 strokeThickness: 3
             }
@@ -196,9 +194,8 @@ export class MultiplayerResults extends Scene {
             "BATTLE SUMMARY",
             {
                 fontSize: 50,
-                fontFamily: "monospace",
-                color: "#000000",
-                fontStyle: "bold"
+                fontFamily: "grotesk-bold",
+                color: "#000000"
             }
         ).setOrigin(0.5);
 
@@ -219,8 +216,8 @@ export class MultiplayerResults extends Scene {
             y + 95,
             statsText,
             {
-                fontSize: 24,
-                fontFamily: "monospace",
+                fontSize: 34,
+                fontFamily: "grotesk",
                 color: "#000000",
                 align: "center",
                 lineSpacing: 9,
@@ -233,8 +230,8 @@ export class MultiplayerResults extends Scene {
 
     buildReplayButton(x, y) {
         const btn = this.add.text(x, y, "REPLAY", {
-            fontSize: 30,
-            fontFamily: "monospace",
+            fontSize: 40,
+            fontFamily: "grotesk-bold",
             padding: { x: 14, y: 6 },
             backgroundColor: "#000000",
             color: "#FFFFFF"
@@ -250,8 +247,8 @@ export class MultiplayerResults extends Scene {
 
     buildHomeButton(x, y) {
         const btn = this.add.text(x, y, "HOME", {
-            fontSize: 30,
-            fontFamily: "monospace",
+            fontSize: 40,
+            fontFamily: "grotesk-bold",
             padding: { x: 14, y: 6 },
             backgroundColor: "#000000",
             color: "#FFFFFF"

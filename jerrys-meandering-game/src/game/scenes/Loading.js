@@ -24,14 +24,14 @@ export class Loading extends Scene {
         const barWidth = width * 0.75;
         const barHeight = 35;
 
-        this.barBg = this.add.rectangle(width / 2, height * 0.6, barWidth, barHeight, 0x222222);
+        this.barBg = this.add.rectangle(width / 2, height * 0.6, barWidth, barHeight, 0xffffff);
 
         this.progressBar = this.add.rectangle(
             width / 2 - barWidth / 2,
             height * 0.6,
             0,
             barHeight,
-            0xffffff
+            0x000000
         ).setOrigin(0, 0.5);
 
         this.percentText = this.add.text(width / 2, height * 0.65, "0%", {
