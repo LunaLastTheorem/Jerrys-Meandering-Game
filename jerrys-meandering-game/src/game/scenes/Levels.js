@@ -32,7 +32,7 @@ export class Levels extends Scene {
             "HOME",
             {
                 fontSize: 30,
-                fontFamily: "monospace",
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -59,7 +59,7 @@ export class Levels extends Scene {
             button.levelIndex = i;
 
             button.setScale(0.9);
-            let text = this.add.text(xOff - 100, yOff - 175, "Level " + (i + 1), { fontSize: '40px', fill: '#fff' }).setFontFamily("monospace");
+            let text = this.add.text(xOff - 100, yOff - 175, "Level " + (i + 1), { fontSize: '40px', fill: '#000' }).setFontFamily("grotesk");
 
             if (i > unlockedLevel) {
                 button.setTint(0x555555);

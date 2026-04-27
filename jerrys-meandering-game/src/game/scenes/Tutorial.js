@@ -7,8 +7,8 @@ export class Tutorial extends Scene {
     }
 
     preload() {
-        this.load.image('board', 'assets/gameboard.png');
-        this.load.image('ins', 'assets/instructions.png');
+        this.load.image('board', 'assets/gameb.png');
+        this.load.image('ins', 'assets/instruct.png');
         this.load.image('dot', 'assets/dot.png');
         this.load.image('dist', 'assets/district.png');
         this.load.image('comp', 'assets/complete.png');
@@ -22,18 +22,18 @@ export class Tutorial extends Scene {
 
         this.add.text(width / 2, height * .2, "TUTORIAL", {
             fontSize: "70px",
-            fontFamily: "monospace",
-            color: "#ffffff"
+            fontFamily: "grotesk-bold",
+            color: "#000000"
         }).setOrigin(0.5);
 
         const slide1 = [
             this.add.text(width / 2, height * .75, "First choose a game mode!", {
                 fontSize: "42px",
-                fontFamily: "monospace",
-                color: "#ffffff"
+                fontFamily: "grotesk",
+                color: "#000000"
             }).setOrigin(0.5),
     
-            this.add.image(width / 2, height / 2 - 150, 'playButton').setScale(0.35),
+            this.add.image(width / 2, height / 2 - 150, 'playButton').setScale(0.2),
             this.add.image(width / 2, height / 2, 'unlimitedButton').setScale(0.35),
             this.add.image(width / 2, height / 2 + 150, 'multiButton').setScale(0.35)
         ];
@@ -41,8 +41,8 @@ export class Tutorial extends Scene {
         const slide2 = [
             this.add.text(width / 2, height * .75, "After you have selected the mode/level you'd like to play, you will be directed to the game board.", {
                 fontSize: "42px",
-                fontFamily: "monospace",
-                color: "#ffffff",
+                fontFamily: "grotesk",
+                color: "#000000",
                 align: "center",
                 wordWrap: { width: width * 0.8 }
             }).setOrigin(0.5),
@@ -53,8 +53,8 @@ export class Tutorial extends Scene {
         const slide3 = [
             this.add.text(width / 2, height * .75, "Your task: Create districts of the instructed size out of the dots to make your color win.", {
                 fontSize: "42px",
-                fontFamily: "monospace",
-                color: "#ffffff",
+                fontFamily: "grotesk",
+                color: "#000000",
                 align: "center",
                 wordWrap: { width: width * 0.8 }
             }).setOrigin(0.5),
@@ -65,8 +65,8 @@ export class Tutorial extends Scene {
         const slide4 = [
             this.add.text(width / 2, height * .75, "How to play: Begin by selecting a dot and clicking on it. To deselect a dot press it a second time.", {
                 fontSize: "42px",
-                fontFamily: "monospace",
-                color: "#ffffff",
+                fontFamily: "grotesk",
+                color: "#000000",
                 align: "center",
                 wordWrap: { width: width * 0.8 }
             }).setOrigin(0.5),
@@ -77,8 +77,8 @@ export class Tutorial extends Scene {
         const slide5 = [
             this.add.text(width / 2, height * .75, "Making a district: Select the dots that you would like to combine into a district. Districts are made up of contiguous dots, meaning that they must all connect.", {
                 fontSize: "42px",
-                fontFamily: "monospace",
-                color: "#ffffff",
+                fontFamily: "grotesk",
+                color: "#000000",
                 align: "center",
                 wordWrap: { width: width * 0.8 }
             }).setOrigin(0.5),
@@ -89,8 +89,8 @@ export class Tutorial extends Scene {
         const slide6 = [
             this.add.text(width / 2, height * .75, "Completing the puzzle: The puzzle can be submitted after all the dots have been placed into their own district.", {
                 fontSize: "42px",
-                fontFamily: "monospace",
-                color: "#ffffff",
+                fontFamily: "grotesk",
+                color: "#000000",
                 align: "center",
                 wordWrap: { width: width * 0.8 }
             }).setOrigin(0.5),
@@ -101,8 +101,8 @@ export class Tutorial extends Scene {
         const slide7 = [
             this.add.text(width / 2, height * .75, "Your Turn!", {
                 fontSize: "42px",
-                fontFamily: "monospace",
-                color: "#ffffff"
+                fontFamily: "grotesk",
+                color: "#000000"
             }).setOrigin(0.5),
         ];
 
@@ -115,7 +115,7 @@ export class Tutorial extends Scene {
 
         const nextButton = this.add.text(width / 2 + 175, height * .9, "NEXT", {
             fontSize: "48px",
-            fontFamily: "monospace",
+            fontFamily: "grotesk-bold",
             color: "#ffffff",
             backgroundColor: "#000000",
             padding: { x: 20, y: 10 }
@@ -135,7 +135,7 @@ export class Tutorial extends Scene {
 
         const prevButton = this.add.text(width / 2 - 175, height * .9, "PREVIOUS", {
             fontSize: "48px",
-            fontFamily: "monospace",
+            fontFamily: "grotesk-bold",
             color: "#ffffff",
             backgroundColor: "#000000",
             padding: { x: 20, y: 10 }
@@ -196,7 +196,7 @@ export class Tutorial extends Scene {
             "HOME",
             {
                 fontSize: 30,
-                fontFamily: "monospace",
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"

@@ -64,7 +64,7 @@ export class Grid extends Scene {
         this.lightRed = 0xFFA3A6;
         this.red = 0xE9141D;
         this.blue = 0x0015BC;
-        this.textSize = 20;
+        this.textSize = 40;
         this.margin = 20;
     }
 
@@ -215,7 +215,7 @@ export class Grid extends Scene {
         const numDistricts = (this.gridModel.rows * this.gridModel.cols) / (this.gridModel.districtSize);
         const colorToWin = this.gridModel.whoWins === "b" ? "blue" : "red";
 
-        const topMargin = this.gridManager.offsetY / 2 + 50;
+        const topMargin = this.gridManager.offsetY / 2 + 70;
 
         this.add.text(
             this.scale.width / 2,
@@ -242,8 +242,8 @@ export class Grid extends Scene {
             buttonY + 50,
             "SUBMIT",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -265,8 +265,8 @@ export class Grid extends Scene {
             this.scale.height * 0.1 + 50,
             "HOME",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -288,8 +288,8 @@ export class Grid extends Scene {
             this.scale.height * 0.1 + 50,
             "LEVELS",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -305,9 +305,8 @@ export class Grid extends Scene {
     textStyle(color) {
         return {
             fontSize: this.textSize,
-            fontFamily: "monospace",
-            color,
-            fontStyle: "bold"
+            fontFamily: "grotesk-bold",
+            color
         };
     }
 

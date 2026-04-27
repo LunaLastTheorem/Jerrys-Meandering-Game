@@ -16,8 +16,8 @@ export class MultiplayerMode extends Scene {
             this.scale.height * 0.25,
             "Back",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -36,8 +36,8 @@ export class MultiplayerMode extends Scene {
             this.scale.height * 0.5,
             "Player VS Player",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
@@ -56,8 +56,8 @@ export class MultiplayerMode extends Scene {
             this.scale.height * 0.75,
             "Player VS Machine",
             {
-                fontSize: 30,
-                fontFamily: "monospace",
+                fontSize: 40,
+                fontFamily: "grotesk-bold",
                 padding: { x: 14, y: 6 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"

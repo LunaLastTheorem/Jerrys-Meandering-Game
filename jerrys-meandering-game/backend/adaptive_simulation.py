@@ -29,7 +29,7 @@ def determine_steps(grid_rows, grid_cols):
             'thin': 1,
             'expected_samples': 1000
         }
-    elif num_cells <= 100: # 10x10 or smaller
+    elif num_cells <= 81: # 9x9 or smaller
         return {
             'total_steps': 10000,
             'thin': 10,
@@ -38,7 +38,7 @@ def determine_steps(grid_rows, grid_cols):
     else: # Larger than 10x10
         return {
             'total_steps': 20000,
-            'thin': 100,
+            'thin': 10,
             'expected_samples': 2000
         }
 

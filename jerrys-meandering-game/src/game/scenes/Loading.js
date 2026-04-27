@@ -17,26 +17,27 @@ export class Loading extends Scene {
 
         this.add.text(width / 2, height * 0.2, "Loading Level...", {
             fontSize: "52px",
-            fontFamily: "monospace",
-            color: "#ffffff"
+            fontFamily: "grotesk-bold",
+            color: "#000000"
         }).setOrigin(0.5);
 
         const barWidth = width * 0.75;
         const barHeight = 35;
 
-        this.barBg = this.add.rectangle(width / 2, height * 0.6, barWidth, barHeight, 0x222222);
+        this.barBg = this.add.rectangle(width / 2, height * 0.6, barWidth, barHeight, 0xffffff);
 
         this.progressBar = this.add.rectangle(
             width / 2 - barWidth / 2,
             height * 0.6,
             0,
             barHeight,
-            0xffffff
+            0x000000
         ).setOrigin(0, 0.5);
 
         this.percentText = this.add.text(width / 2, height * 0.65, "0%", {
             fontSize: "44px",
-            color: "#ffffff"
+            fontFamily: "grotesk",
+            color: "#000000"
         }).setOrigin(0.5);
 
         this.facts = [
@@ -72,8 +73,9 @@ export class Loading extends Scene {
         ]
 
         this.factText = this.add.text(width / 2, height * 0.75, "", {
-            fontSize: "32px",
-            color: "#ffffff",
+            fontSize: "50px",
+            fontFamily: "grotesk",
+            color: "#000000",
             align: "center",
             wordWrap: { width: width * 0.8 }
         }).setOrigin(0.5);
@@ -141,7 +143,7 @@ export class Loading extends Scene {
 
         const nextButton = this.add.text(width / 2, height * 0.85, "CONTINUE", {
             fontSize: "48px",
-            fontFamily: "monospace",
+            fontFamily: "grotesk-bold",
             color: "#ffffff",
             backgroundColor: "#000000",
             padding: { x: 20, y: 10 }
