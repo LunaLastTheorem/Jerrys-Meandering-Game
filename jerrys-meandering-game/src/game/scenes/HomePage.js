@@ -7,20 +7,32 @@ export class HomePage extends Scene {
     }
 
     preload() {
-        this.load.image('background', 'assets/title.png');
-        this.load.image('bg', 'assets/background.png');
-        this.load.image('playButton', 'assets/start.png');
-        this.load.image('unlimitedButton', 'assets/unlimited.png');
-        this.load.image('multiButton', 'assets/multi.png');
+        this.load.image('background', 'assets/gamehome.png');
+        this.load.image('bg', 'assets/border.png');
+        this.load.image('gecko', 'assets/gecko.png');
+        this.load.image('playButton', 'assets/startb.png');
+        this.load.image('unlimitedButton', 'assets/unlimitedb.png');
+        this.load.image('multiButton', 'assets/multib.png');
+        this.load.font('grotesk', 'assets/fonts/recent-grotesk-regular.otf', 'opentype');
+        this.load.font('grotesk-bold', 'assets/fonts/recent-grotesk-bold.otf', 'opentype');
     }
 
     create() {
-        let back = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'background');
-        back.setScale(2.0);
+        const { width, height } = this.scale;
+        let back = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY + 40, 'background');
+        back.setScale(0.28);
+
+        this.add.text(width / 2, height * .1, "JERRYS MEANDERING GAME", {
+            fontSize: "80px",
+            fontFamily: "grotesk-bold",
+            color: "#000000"
+        }).setOrigin(0.5);
+
+        this.add.image(width / 2, height * .32, 'gecko').setScale(0.35);
 
         const playButton = this.add.image(this.cameras.main.centerX, 825, 'playButton');
         playButton.setInteractive();
-        playButton.setScale(0.35);
+        playButton.setScale(0.25);
 
         playButton.on('pointerover', () => {
             playButton.setAlpha(0.5);
@@ -33,7 +45,7 @@ export class HomePage extends Scene {
             this.scene.start("Levels");
         });
 
-        const infinityMode = this.add.image(this.cameras.main.centerX - 175, 975, 'unlimitedButton')
+        const infinityMode = this.add.image(this.cameras.main.centerX - 105, 950, 'unlimitedButton')
         infinityMode.setInteractive()
         infinityMode.setScale(0.35)
 
@@ -48,7 +60,7 @@ export class HomePage extends Scene {
             this.scene.start("InfinityMode")
         })
         
-        const multiplayerMode = this.add.image(this.cameras.main.centerX + 175, 975, 'multiButton')
+        const multiplayerMode = this.add.image(this.cameras.main.centerX + 115, 950, 'multiButton')
         multiplayerMode.setInteractive()
         multiplayerMode.setScale(0.35)
         
@@ -64,13 +76,13 @@ export class HomePage extends Scene {
         })
 
         const tutorialButton = this.add.graphics()
-        tutorialButton.fillStyle(0x002387, 1);
-        tutorialButton.fillCircle(this.cameras.main.centerX + 195, 825, 30);
+        tutorialButton.fillStyle(0x1E439B, 1);
+        tutorialButton.fillCircle(this.cameras.main.centerX + 180, 825, 30);
 
-        const touchSensor = new Phaser.Geom.Circle(this.cameras.main.centerX + 195, 825, 30);
+        const touchSensor = new Phaser.Geom.Circle(this.cameras.main.centerX + 180, 825, 30);
         tutorialButton.setInteractive(touchSensor, Phaser.Geom.Circle.Contains);
 
-        const symbol = this.add.text(this.cameras.main.centerX + 195, 825, "?", {
+        const symbol = this.add.text(this.cameras.main.centerX + 180, 825, "?", {
             fontSize: '40px',
             color: '#ffffff',
             fontStyle: "bold"
@@ -86,6 +98,40 @@ export class HomePage extends Scene {
         });
         tutorialButton.on('pointerdown', () => {
             this.scene.start("Tutorial");
+        });
+
+        const borderDiv = document.createElement('div');
+        borderDiv.style.position = 'fixed';
+        borderDiv.style.top = '0';
+        borderDiv.style.left = '0';
+        borderDiv.style.width = '100vw';
+        borderDiv.style.height = '100vh';
+        borderDiv.style.border = '15px solid transparent';
+        borderDiv.style.pointerEvents = 'none';
+        borderDiv.style.boxSizing = 'border-box';
+        borderDiv.style.zIndex = '9999';
+        borderDiv.style.borderImage = 'linear-gradient(to right, blue, red, blue) 1';
+        document.body.appendChild(borderDiv);
+
+        const style = document.createElement('style');
+        style.textContent = `
+        @keyframes gradientShift {
+            0% { border-image: linear-gradient(to right, blue, red, blue) 1; }
+            50% { border-image: linear-gradient(to right, red, blue, red) 1; }
+            100% { border-image: linear-gradient(to right, blue, red, blue) 1; }
+        }
+        .dynamic-border {
+            animation: gradientShift 5s linear infinite;
+        }
+        `;
+        document.head.appendChild(style);
+        borderDiv.classList.add('dynamic-border');
+
+        this.events.on('shutdown', () => {
+            if (borderDiv) {
+                borderDiv.classList.remove('dynamic-border');
+                borderDiv.style.borderImage = 'linear-gradient(to right, blue, red, blue) 1';
+            }
         });
 
         EventBus.emit('current-scene-ready', this);
