@@ -215,7 +215,7 @@ export class Grid extends Scene {
         const numDistricts = (this.gridModel.rows * this.gridModel.cols) / (this.gridModel.districtSize);
         const colorToWin = this.gridModel.whoWins === "b" ? "blue" : "red";
 
-        const topMargin = this.gridManager.offsetY / 2 + 60;
+        const topMargin = this.gridManager.offsetY / 2 + 70;
 
         this.add.text(
             this.scale.width / 2,
