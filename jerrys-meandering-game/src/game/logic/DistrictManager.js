@@ -71,7 +71,6 @@ export class DistrictManager {
             this.formDistrict(this.selectedCells);
             this.selectedCells = [];
         }
-        console.log("Selected Cells:" + this.selectedCells.length);
     }
 
     /**
@@ -89,7 +88,6 @@ export class DistrictManager {
 
         for (const newCell of newCells) {
             for (const trueCell of this.selectedCells) {
-                console.log(newCell[0], newCell[1], trueCell.row, trueCell.col);
 
                 if (newCell[0] === trueCell.row && newCell[1] === trueCell.col) {
                     return true

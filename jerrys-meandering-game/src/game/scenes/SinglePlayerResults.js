@@ -193,10 +193,11 @@ export class SinglePlayerResults extends Scene {
         let rows = this.gridModel.rows
         let newLevel = this.level + 1
         if (newLevel % 3 === 0){
-            if(cols < rows){
-                cols++
-            }else{
-                rows++
+            if(cols === rows){
+                cols += 1
+            }
+            else{
+                rows += 1
             }
         }
         const nextButton = this.add.text(x, y, "NEXT", {
