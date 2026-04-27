@@ -5,6 +5,8 @@ import { DistrictModel } from "../../models/DistrictModel.js";
 import { MultiplayerDistrictManager } from "../../logic/MultiplayerDistrictManager.js";
 import { EventBus } from "../../events/EventBus.js";
 import { PuzzleSubmissionService } from "../../services/PuzzleSubmissionService.js";
+import { AIAgent } from "./AIAgent.js";
+
 
 export class MultiplayerGrid extends Scene {
     constructor() {
@@ -23,7 +25,7 @@ export class MultiplayerGrid extends Scene {
      * 
      * @param {object} data An object that has a puzzle object. Each puzzle object has an index, rows, cols, and districtSize.
      */
-    create(data) {
+    create(data) {        
         this.currentLevelIndex = data.puzzle.index;
         this.puzzleId = data.id ?? 0;
         this.isInfiniteMode = data.isInfinityMode ?? false;
@@ -34,11 +36,14 @@ export class MultiplayerGrid extends Scene {
         this.submissionService = new PuzzleSubmissionService();
         this.activeDistricts = []; // Track all active districts for border management
         this.level = data.level;
-
         this.currentTurn = "blue";
         this.turnLocked = false;
 
         this.permLocked = new Set()
+
+        this.vsAI = data.vsAI
+        this.aiColor = data.aiColor
+        this.aiAgent  = this.vsAI ? new AIAgent(this.aiColor, this.gridModel.districtSize) : null;
 
         EventBus.on("cell:toggled", this.onCellToggled, this);
         EventBus.on("district:formed", this.onDistrictFormed, this);
@@ -178,7 +183,47 @@ export class MultiplayerGrid extends Scene {
         this.turnText.setStyle(this.turnTextStyle());
 
         this.turnLocked = true;
-        this.time.delayedCall(400, () => { this.turnLocked = false; });
+        this.time.delayedCall(400, () => { 
+            this.turnLocked = false; 
+
+            if(this.vsAI && this.currentTurn === this.aiColor){
+                this.time.delayedCall(600, () => this.triggerAITurn())
+            }
+        });
+    }
+
+    triggerAITurn(){
+        const grid = this.copyGird()
+        const lockedSet = this.districtManager.permanentlySelectedCells;
+
+        const region = this.aiAgent.myTurn(grid, lockedSet)
+
+        const color = this.aiColor === "blue" ? this.lightBlue : this.lightRed
+        for (const cell of region) {
+            EventBus.emit("cell:clicked", { row: cell.row, col: cell.col });
+        }
+        this.time.delayedCall(700, () => this.switchTurn())
+    }
+
+    copyGird(){
+        const {rows, cols} = this.gridModel
+        const lockedSet = this.districtManager.permanentlySelectedCells
+        const grid = []
+
+        for(let r = 0; r < rows; r++){
+            grid[r] = []
+            for(let c = 0; c < cols; c++){
+                const cell = this.gridModel.getCell(r, c)
+                grid[r][c] = {
+                    row: r,
+                    col: c,
+                    isBlue: cell.isBlue,
+                    locked: lockedSet.has(`${r},${c}`)
+                }
+            }
+        }
+
+        return grid;
     }
 
     buildLockButton() {
