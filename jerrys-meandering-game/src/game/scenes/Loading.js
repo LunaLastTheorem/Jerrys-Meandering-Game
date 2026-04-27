@@ -7,6 +7,7 @@ export class Loading extends Scene {
 
     init(data) {
         this.levelIndex = data.levelIndex;
+        this.load.image('gecko', 'assets/gecko.png');
     }
 
     create() {
@@ -20,6 +21,8 @@ export class Loading extends Scene {
             fontFamily: "grotesk-bold",
             color: "#000000"
         }).setOrigin(0.5);
+
+        this.gecko = this.add.image(width / 2, height * 0.40, 'gecko').setScale(0.25);
 
         const barWidth = width * 0.75;
         const barHeight = 35;
@@ -93,19 +96,26 @@ export class Loading extends Scene {
     loadLevel() {
         const url = `http://127.0.0.1:5000/puzzle/${this.levelIndex}`;
 
-        const MIN_LOAD_TIME = 1500;
+        const MIN_LOAD_TIME = 2000;
         const startTime = Date.now();
 
         let progress = 0;
 
+        const geckoSpinTween = this.tweens.add({
+            targets: this.gecko,
+            rotation: Math.PI * 2,
+            duration: 2000,
+            loop: -1,
+            ease: 'Linear'
+        });
+
         const progressTimer = this.time.addEvent({
-            delay: 100,
+            delay: 200,
             loop: true,
             callback: () => {
-                if (progress < 0.9) {
-                    progress += 0.02;
-                    this.updateProgress(progress);
-                }
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / MIN_LOAD_TIME, 0.95);
+                this.updateProgress(progress);
             }
         });
 
@@ -118,11 +128,11 @@ export class Loading extends Scene {
                 const elapsed = Date.now() - startTime;
                 const remainingTime = Math.max(0, MIN_LOAD_TIME - elapsed);
 
-                progressTimer.remove(false);
-
-                this.updateProgress(1);
-
                 this.time.delayedCall(remainingTime, () => {
+                    progressTimer.remove(false);
+                    geckoSpinTween.stop();
+                    geckoSpinTween.targets[0].rotation = 0;
+                    this.updateProgress(1);
                     this.showContinueButton(puzzle);
                 });
             })

@@ -8,16 +8,26 @@ export class Levels extends Scene {
 
     preload() {
         this.load.spritesheet('map', 'assets/states.png', { frameWidth: 283, frameHeight: 282 });
+        this.load.image('gecko', 'assets/gecko.png');
     }
 
     create() {
         let bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'bg');
         bg.setScale(4.0);
 
-        this.cameras.main.setBounds(0, 0, 1500, 3800);
+        this.cameras.main.setBounds(0, 0, 1500, 4200);
         this.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
             this.cameras.main.scrollY += deltaY;
         }, this);
+
+        const { width, height } = this.scale;
+        this.add.text(width / 2, height * .1, "Gerrymander All 50 States", {
+            fontSize: "80px",
+            fontFamily: "grotesk-bold",
+            color: "#000000"
+        }).setOrigin(0.5);
+
+        this.add.image(width / 2, height * .30, 'gecko').setScale(0.25);
 
         this.createLevelButtons();
         this.createHomeButton();
@@ -28,7 +38,7 @@ export class Levels extends Scene {
     createHomeButton() {
         const homeButton = this.add.text(
             this.scale.width / 2,
-            this.scale.height * 0.15,
+            this.scale.height * 0.45,
             "HOME",
             {
                 fontSize: 30,
@@ -48,7 +58,7 @@ export class Levels extends Scene {
     createLevelButtons() {
         const levels = 49;
         let xOff = 450;
-        let yOff = 400;
+        let yOff = this.scale.height * 0.7;
         const buttonSpacingX = 250;
         const buttonSpacingY = 350;
 

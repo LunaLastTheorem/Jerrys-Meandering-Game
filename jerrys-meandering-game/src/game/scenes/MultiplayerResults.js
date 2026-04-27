@@ -216,8 +216,8 @@ export class MultiplayerResults extends Scene {
             y + 95,
             statsText,
             {
-                fontSize: 34,
-                fontFamily: "grotesk",
+                fontSize: 24,
+                fontFamily: "monospace",
                 color: "#000000",
                 align: "center",
                 lineSpacing: 9,

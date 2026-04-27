@@ -19,9 +19,13 @@ export default function StartGame(parent) {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH
         },
+        render: {
+            antialias: true,
+            pixelArt: false,
+            roundPixels: true
+        },
         parent,
         backgroundColor: '#ffffff',
-        // transparent: true, // this makes the canvas transparent
         scene: [HomePage, Levels, Grid, SinglePlayerResults, MultiplayerResults, InfinityMode, MultiplayerMode, MultiplayerGrid, Loading, Tutorial]
     };
 
