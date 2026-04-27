@@ -96,7 +96,7 @@ export class MultiplayerMode extends Scene {
                 return response.json();
             })
             .then(puzzle => {
-                this.scene.start("MultiplayerGrid", { puzzle });
+                this.scene.start("MultiplayerGrid", { puzzle, vsAI: true, aiColor: "red"});
             });
     }
 
