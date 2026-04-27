@@ -13,6 +13,7 @@ export class MultiplayerGrid extends Scene {
 
     preload() {
         this.initConstants();
+        this.load.image('gecko', 'assets/gecko.png');
     }
 
     /**
@@ -71,11 +72,11 @@ export class MultiplayerGrid extends Scene {
      * Updated every time switchTurn() is called.
      */
     buildTurnIndicator() {
-        const topMargin = this.gridManager.offsetY / 2 + 25;
+        const topMargin = this.gridManager.offsetY / 2 + 30;
 
         this.turnText = this.add.text(
             this.scale.width / 2,
-            topMargin + this.textSize * 2 + 5,
+            topMargin + this.textSize * 1.5,
             this.getTurnLabel(),
             this.turnTextStyle()
         ).setOrigin(0.5);
@@ -321,7 +322,7 @@ export class MultiplayerGrid extends Scene {
      */
     buildTextUI() {
         const numDistricts = (this.gridModel.rows * this.gridModel.cols) / (this.gridModel.districtSize);
-        const topMargin = this.gridManager.offsetY / 2 + 55;
+        const topMargin = this.gridManager.offsetY / 2 + 35;
 
         this.add.text(
             this.scale.width / 2,
@@ -338,7 +339,7 @@ export class MultiplayerGrid extends Scene {
         const buttonY = this.gridManager.offsetY + this.gridModel.rows * this.gridManager.cellSize + 50;
         this.submitButton = this.add.text(
             this.scale.width / 2,
-            buttonY + 75,
+            buttonY + 80,
             "SUBMIT",
             {
                 fontSize: 40,
@@ -361,7 +362,7 @@ export class MultiplayerGrid extends Scene {
     buildHomeButton() {
         const homeButton = this.add.text(
             this.scale.width * 0.45,
-            this.scale.height * 0.1 + 40,
+            this.scale.height * 0.05 + 45,
             "HOME",
             {
                 fontSize: 40,
@@ -384,7 +385,7 @@ export class MultiplayerGrid extends Scene {
     buildLevelsButton() {
         const levelsButton = this.add.text(
             this.scale.width * 0.55,
-            this.scale.height * 0.1 + 40,
+            this.scale.height * 0.05 + 45,
             "LEVELS",
             {
                 fontSize: 40,

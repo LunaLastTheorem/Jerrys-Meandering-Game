@@ -7,18 +7,18 @@ export class MultiplayerMode extends Scene {
     }
 
     preload() {
-        this.load.image('bg', 'assets/background.png');
+        this.load.image('gecko', 'assets/gecko.png');
     }
 
     createHomeButton() {
         const homeButton = this.add.text(
             this.scale.width / 2,
-            this.scale.height * 0.25,
-            "Back",
+            this.scale.height * 0.75,
+            "Home",
             {
-                fontSize: 40,
+                fontSize: 36,
                 fontFamily: "grotesk-bold",
-                padding: { x: 14, y: 6 },
+                padding: { x: 12, y: 10 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
             }
@@ -33,12 +33,12 @@ export class MultiplayerMode extends Scene {
     createPvPButton() {
         const PvPButton = this.add.text(
             this.scale.width / 2,
-            this.scale.height * 0.5,
+            this.scale.height * 0.55,
             "Player VS Player",
             {
                 fontSize: 40,
                 fontFamily: "grotesk-bold",
-                padding: { x: 14, y: 6 },
+                padding: { x: 20, y: 16 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
             }
@@ -53,12 +53,12 @@ export class MultiplayerMode extends Scene {
     createAIButton() {
         const AIButton = this.add.text(
             this.scale.width / 2,
-            this.scale.height * 0.75,
+            this.scale.height * 0.65,
             "Player VS Machine",
             {
                 fontSize: 40,
                 fontFamily: "grotesk-bold",
-                padding: { x: 14, y: 6 },
+                padding: { x: 20, y: 16 },
                 backgroundColor: "#000000",
                 color: "#FFFFFF"
             }
@@ -105,6 +105,15 @@ export class MultiplayerMode extends Scene {
         bg.setScale(4.0);
 
         this.cameras.main.setBounds(0, 0, 1500, 3800);
+
+        const { width, height } = this.scale;
+        this.add.text(width / 2, height * .1, "CHOOSE YOUR BATTLE", {
+            fontSize: "80px",
+            fontFamily: "grotesk-bold",
+            color: "#000000"
+        }).setOrigin(0.5);
+
+        this.add.image(width / 2, height * .32, 'gecko').setScale(0.35);
 
         this.createPvPButton();
         this.createAIButton();
