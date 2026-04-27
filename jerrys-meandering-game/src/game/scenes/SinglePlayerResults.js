@@ -159,7 +159,7 @@ export class SinglePlayerResults extends Scene {
         // Stats text
         const statsText = [
             `Total Districts on Map: ${stats.num_districts} Districts`,
-            `Total Generated Maps: ${stats.total_samples} samples`,
+            `Total Simulated Maps: ${stats.total_samples} samples`,
             ``,
             `Your Map: ${stats.submitted_seats} Districts`,
             `Median: ${stats.medians} Districts`,

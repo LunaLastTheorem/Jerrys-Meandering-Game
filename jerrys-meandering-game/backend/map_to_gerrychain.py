@@ -84,12 +84,12 @@ def generate_voting_data(node_id, cell_color):
 
     if cell_color == "b":
         # Blue cell: strong democratic lean
-        dem_votes = random.randint(850, 950)
-        rep_votes = random.randint(20, 100)
+        dem_votes = 900
+        rep_votes = 100
     else:
         # Red cell: strong republican lean
-        dem_votes = random.randint(20, 100)
-        rep_votes = random.randint(850, 950)
+        dem_votes = 100
+        rep_votes = 900
     
     other_votes = TOTPOP - (dem_votes + rep_votes)
 

@@ -337,7 +337,7 @@ export class MultiplayerGrid extends Scene {
      */
     buildSubmitButton() {
         const buttonY = this.gridManager.offsetY + this.gridModel.rows * this.gridManager.cellSize + 50;
-        const submitButton = this.add.text(
+        this.submitButton = this.add.text(
             this.scale.width / 2,
             buttonY + 50,
             "SUBMIT",
@@ -352,8 +352,8 @@ export class MultiplayerGrid extends Scene {
             .setOrigin(0.5)
             .setInteractive()
             .on("pointerdown", () => this.displayWon())
-            .on("pointerover", () => submitButton.setAlpha(0.5))
-            .on("pointerout", () => submitButton.setAlpha(1));
+            .on("pointerover", () => this.submitButton.setAlpha(0.5))
+            .on("pointerout", () => this.submitButton.setAlpha(1));
     }
 
     /**
@@ -411,6 +411,23 @@ export class MultiplayerGrid extends Scene {
         };
     }
 
+    findWinner() {
+        // Compute winner for display purposes
+        const winner = this.districtManager.computeWinner();
+        let color = 0x808080;
+        let message = "It's a Tie!";
+
+        if (winner === "blue") {
+            message = "Blue Wins!";
+            color = this.blue;
+        } else if (winner === "red") {
+            message = "Red Wins!";
+            color = this.red;
+        }
+
+        return { message, color, winner };
+    }
+
     /**
      * This method is called when the user selects the submit button. It validates the puzzle,
      * submits it to the backend API via the PuzzleSubmissionService, and starts the Results scene
@@ -425,27 +442,37 @@ export class MultiplayerGrid extends Scene {
             return;
         }
         try {
-            // Compute winner for display purposes
-            const winner = this.districtManager.computeWinner();
-            let color = this.white;
-            let message = "It's a Tie!";
-            if (winner === "blue") {
-                message = "Blue Wins!";
-                color = this.blue;
-            } else if (winner === "red") {
-                message = "Red Wins!";
-                color = this.red;
+            const payload = this.formatDistrictsForAPI();
+
+            // Show loading message
+            if (this.submitButton) {
+                this.submitButton.setText("EVALUATING...");
+                this.submitButton.disableInteractive();
             }
+
+            // Evaluate map via service
+            const {message, color, winner }= this.findWinner();
+            const evaluationData = await this.submissionService.evaluateMap(payload);
 
             // Start Results scene with metrics
             this.scene.start("MultiplayerResults", {
+                evaluationData: evaluationData,
+                gridModel: this.gridModel,
+                districtManager: this.districtManager,
                 message: message,
                 color: color,
+                winner: winner
             });
 
         } catch (error) {
-            console.error("Error submitting puzzle:", error);
-            alert("Error submitting puzzle. Please check the console.");
+            console.error("Error evaluating map:", error);
+            alert("Error evaluating map. Please check the console.");
+
+            // Re-enable submit button on error
+            if (this.submitButton) {
+                this.submitButton.setText("SUBMIT");
+                this.submitButton.setInteractive();
+            }
         }
     }
 
@@ -457,40 +484,43 @@ export class MultiplayerGrid extends Scene {
     formatDistrictsForAPI() {
         const districts = this.districtManager.districtModel.getDistricts();
         const formattedDistricts = [];
-        let totalVotesA = 0;
-        let totalVotesB = 0;
 
+        // Format districts with cell coordinates
         for (let i = 0; i < districts.length; i++) {
             const district = districts[i];
-            let votesA = 0;
-            let votesB = 0;
-            const cells = [];
-
-            for (const cell of district.cells) {
-                cells.push([cell.row, cell.col]);
-                if (cell.isBlue) {
-                    votesA++;
-                } else {
-                    votesB++;
-                }
-            }
-
-            totalVotesA += votesA;
-            totalVotesB += votesB;
+            const cells = district.cells.map(cell => [cell.row, cell.col]);
 
             formattedDistricts.push({
                 id: i,
-                cells: cells,
-                votes_party_a: votesA,
-                votes_party_b: votesB
+                cells: cells
             });
         }
 
+        // Reconstruct grid from cell data
+        const grid = [];
+        for (let r = 0; r < this.gridModel.rows; r++) {
+            grid[r] = [];
+            for (let c = 0; c < this.gridModel.cols; c++) {
+                const cell = this.gridModel.getCell(r, c);
+                grid[r][c] = cell.isBlue ? "b" : "r";
+            }
+        }
+
+        const { winner } = this.findWinner();
+
+        let winnerCode = "b";
+        if (winner === "red") {
+            winnerCode = "r";
+        } else if (winner === "tie") {
+            winnerCode = "b";
+        }
+
         return {
-            puzzle_id: this.puzzleId,
-            districts: formattedDistricts,
-            total_votes_party_a: totalVotesA,
-            total_votes_party_b: totalVotesB
+            grid: grid, // 2D array of cell colors
+            rows: this.gridModel.rows,
+            cols: this.gridModel.cols,
+            winner: winnerCode,
+            districts: formattedDistricts
         };
     }
 
