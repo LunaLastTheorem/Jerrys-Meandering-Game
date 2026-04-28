@@ -10,7 +10,8 @@ export class InfinityMode extends Scene {
     }
 
     create() {
-        const url = `http://127.0.0.1:5000/puzzle/3/3`;
+        const saved = JSON.parse(localStorage.getItem("infinityProgress")) ?? {level : 0, rows: 3, cols: 3}
+        const url = `http://127.0.0.1:5000/puzzle/${saved.rows}/${saved.cols}`;
 
         fetch(url)
             .then(response => {
@@ -20,7 +21,7 @@ export class InfinityMode extends Scene {
                 return response.json();
             })
             .then(puzzle => {
-                this.scene.start("Grid", { puzzle, isInfinityMode: true, level: 0 });
+                this.scene.start("Grid", { puzzle, isInfinityMode: true, level: saved.level });
             });
     }
 }

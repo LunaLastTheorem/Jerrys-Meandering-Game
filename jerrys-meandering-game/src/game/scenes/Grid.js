@@ -327,7 +327,7 @@ export class Grid extends Scene {
         try {
             // Format districts for API
             const payload = this.formatMapForEvaluation();
-            
+
             // Show loading message
             if (this.submitButton) {
                 this.submitButton.setText("EVALUATING...");
@@ -338,22 +338,29 @@ export class Grid extends Scene {
             const evaluationData = await this.submissionService.evaluateMap(payload);
 
             // Unlock levels if in levels mode
-            if (!this.isInfiniteMode){
+            if (!this.isInfiniteMode) {
                 const saved = localStorage.getItem("unlockedLevel");
                 const unlockedLevel = saved ? parseInt(saved) : 0;
-    
+
                 if (this.currentLevelIndex >= unlockedLevel) {
                     localStorage.setItem("unlockedLevel", this.currentLevelIndex + 1);
                 }
             }
+            else {
+                localStorage.setItem("infinityProgress", JSON.stringify({
+                    level: this.level,
+                    rows: this.gridModel.rows,
+                    cols: this.gridModel.cols
+                }));
+            }
 
             // Start Results scene with evaluation data
-            this.scene.start("SinglePlayerResults", { 
+            this.scene.start("SinglePlayerResults", {
                 evaluationData: evaluationData,
                 gridModel: this.gridModel,
                 level: this.level,
                 isInfinityMode: this.isInfiniteMode
-            });            
+            });
 
         } catch (error) {
             console.error("Error evaluating map:", error);
