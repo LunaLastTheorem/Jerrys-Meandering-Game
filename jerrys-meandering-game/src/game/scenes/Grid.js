@@ -48,8 +48,12 @@ export class Grid extends Scene {
 
         this.buildTextUI();
         this.buildSubmitButton();
-        this.buildHomeButton();
-        this.buildLevelsButton();
+        if (!this.isInfiniteMode) {
+            this.buildHomeButton(this.scale.width * 0.45, this.scale.height * 0.1 + 50);
+            this.buildLevelsButton();
+        } else {
+            this.buildHomeButton(this.scale.width * 0.5, this.scale.height * 0.1 + 50);
+        }
 
         this.events.once("shutdown", this.cleanup, this);
         this.events.once("destroy", this.cleanup, this);
@@ -259,10 +263,10 @@ export class Grid extends Scene {
     /**
      * This method creates the Home button. When selected, it starts the HomePage scene.
      */
-    buildHomeButton() {
+    buildHomeButton(x, y) {
         const homeButton = this.add.text(
-            this.scale.width * 0.45,
-            this.scale.height * 0.1 + 50,
+            x,
+            y,
             "HOME",
             {
                 fontSize: 40,

@@ -56,7 +56,6 @@ export class MultiplayerGrid extends Scene {
         this.buildLockButton();
         this.buildSubmitButton();
         this.buildHomeButton();
-        this.buildLevelsButton();
 
         this.events.once("shutdown", this.cleanup, this);
         this.events.once("destroy", this.cleanup, this);
@@ -406,7 +405,7 @@ export class MultiplayerGrid extends Scene {
      */
     buildHomeButton() {
         const homeButton = this.add.text(
-            this.scale.width * 0.45,
+            this.scale.width * 0.5,
             this.scale.height * 0.05 + 45,
             "HOME",
             {
@@ -422,29 +421,6 @@ export class MultiplayerGrid extends Scene {
             .on("pointerdown", () => this.scene.start("HomePage"))
             .on("pointerover", () => homeButton.setAlpha(0.5))
             .on("pointerout", () => homeButton.setAlpha(1));
-    }
-
-    /**
-     * This method creates the Levels button. When selected, it starts the Levels scene.
-     */
-    buildLevelsButton() {
-        const levelsButton = this.add.text(
-            this.scale.width * 0.55,
-            this.scale.height * 0.05 + 45,
-            "LEVELS",
-            {
-                fontSize: 40,
-                fontFamily: "grotesk-bold",
-                padding: { x: 14, y: 6 },
-                backgroundColor: "#000000",
-                color: "#FFFFFF"
-            }
-        )
-            .setOrigin(0.5)
-            .setInteractive()
-            .on("pointerdown", () => this.scene.start("Levels"))
-            .on("pointerover", () => levelsButton.setAlpha(0.5))
-            .on("pointerout", () => levelsButton.setAlpha(1));
     }
 
     textStyle(color) {
