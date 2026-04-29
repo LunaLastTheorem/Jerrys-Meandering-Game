@@ -347,10 +347,21 @@ export class Grid extends Scene {
                 }
             }
             else {
+                let cols = this.gridModel.cols
+                let rows = this.gridModel.rows
+                let newLevel = this.level + 1
+                if (newLevel % 3 === 0) {
+                    if (cols === rows) {
+                        cols += 1
+                    }
+                    else {
+                        rows += 1
+                    }
+                }
                 localStorage.setItem("infinityProgress", JSON.stringify({
-                    level: this.level,
-                    rows: this.gridModel.rows,
-                    cols: this.gridModel.cols
+                    level: newLevel,
+                    rows: rows,
+                    cols: cols
                 }));
             }
 

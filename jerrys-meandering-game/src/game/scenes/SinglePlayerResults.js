@@ -63,7 +63,7 @@ export class SinglePlayerResults extends Scene {
 
     buildHistogram() {
         const histogramImage = this.evaluationData.histogram_image;
-    
+
         if (!histogramImage) {
             console.error("No histogram image data received");
             return;
@@ -73,7 +73,7 @@ export class SinglePlayerResults extends Scene {
             // Create a DOM image element
             const img = document.createElement('img');
             img.src = 'data:image/png;base64,' + histogramImage;
-            
+
             // Style the image
             img.style.position = "absolute";
             img.style.zIndex = '100';
@@ -121,7 +121,7 @@ export class SinglePlayerResults extends Scene {
 
             this.events.once("shutdown", cleanup);
             this.events.once("destroy", cleanup);
-            
+
         } catch (error) {
             console.error("Error displaying histogram:", error);
         }
@@ -189,17 +189,12 @@ export class SinglePlayerResults extends Scene {
     }
 
     buildNextPuzzleButton(x, y) {
-        let cols = this.gridModel.cols
-        let rows = this.gridModel.rows
-        let newLevel = this.level + 1
-        if (newLevel % 3 === 0){
-            if(cols === rows){
-                cols += 1
-            }
-            else{
-                rows += 1
-            }
-        }
+        const saved = JSON.parse(localStorage.getItem("infinityProgress") || "{}");
+
+        const rows = saved.rows ?? this.gridModel.rows;
+        const cols = saved.cols ?? this.gridModel.cols;
+        const newLevel = saved.level ?? this.level + 1;
+
         const nextButton = this.add.text(x, y, "NEXT", {
             fontSize: 34,
             fontFamily: "grotesk-bold",
@@ -294,7 +289,7 @@ export class SinglePlayerResults extends Scene {
                 replayButton.disableInteractive();
                 this.scene.start("Grid");
 
-                })
+            })
             .on("pointerover", () => replayButton.setAlpha(0.5))
             .on("pointerout", () => replayButton.setAlpha(1));
     }

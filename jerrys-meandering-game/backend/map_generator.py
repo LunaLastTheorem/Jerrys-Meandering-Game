@@ -33,7 +33,7 @@ def generate_puzzle(rows, cols):
     district_size = 0
     grid = []
     
-    if total > 36:
+    if total > 42:
         config = _get_config(total)
         district_size = config[0][1]
         grid = _build_puzzle(rows, cols, who_wins, config[1] + 2)
